@@ -9,7 +9,7 @@ export default class Base {
     return sets;
   }
 
-  protected static _getAllSetsMap<TKey>(setMap: {
+protected static _getAllSetsMap<TKey>(setMap: {
     [key in keyof TKey]: Object;
   }): {
     [key in keyof TKey]: Dataset;
