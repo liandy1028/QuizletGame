@@ -2,21 +2,23 @@ import { group } from 'console';
 import Fun from 'dataset/sets/Fun';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import GameComponent from '../components/game'
-
+import GameComponent from '../components/game';
 
 // #region css
 
 const GameWindow = styled.div`
-  margin: auto;
-  width: 50%;
-  
-`
+  width: 100%;
+  display: flex;
+  canvas {
+    margin: auto;
+    width: 75%;
+  }
+`;
 
 const Banner = styled.div`
   text-align: center;
   font-size: 50px;
-`
+`;
 
 // #endregion
 

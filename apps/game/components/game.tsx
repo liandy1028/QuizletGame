@@ -181,14 +181,17 @@ export default function GameComponent() {
 
   // Make sure the game is only initialized once
   const phaserGameRef = useRef(null);
-  useEffect(() => {
-    console.log("useEffect");
-    if (phaserGameRef.current) {
-      console.log("game instance exists");
-      return;
-    }
-    phaserGameRef.current = initPhaser()
-  }, [] /* only run once; config ref elided on purpose */);
+  useEffect(
+    () => {
+      console.log('useEffect');
+      if (phaserGameRef.current) {
+        console.log('game instance exists');
+        return;
+      }
+      phaserGameRef.current = initPhaser();
+    },
+    [] /* only run once; config ref elided on purpose */
+  );
 
-  return <></>
+  return <></>;
 }
