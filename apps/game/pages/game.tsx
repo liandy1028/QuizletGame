@@ -179,6 +179,7 @@ export default function GameComponent() {
     return game;
   }
 
+  // Make sure the game is only initialized once
   const phaserGameRef = useRef(null);
   useEffect(() => {
     console.log("useEffect");
