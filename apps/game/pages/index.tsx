@@ -2,6 +2,8 @@ import { group } from 'console';
 import Fun from 'dataset/sets/Fun';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Box } from '../components/Box';
+import { Card } from '../components/Card';
 
 // #region constants
 
@@ -19,41 +21,6 @@ const GRAVITY = 2;
 const Container = styled.div`
   display: flex;
   justify-content: center;
-`;
-
-const Box = styled.div<{
-  height: number;
-  width: number;
-  top: number;
-  backgroundColor: string;
-}>`
-  height: ${props => props.height}px;
-  width: ${props => props.width}px;
-  top: ${props => props.top}px;
-  background-color: ${props => props.backgroundColor};
-  position: absolute;
-  overflow: hidden;
-  & span {
-    color: white;
-    font-size: 24px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    text-align: center;
-  }
-`;
-
-const Card = styled.div<{
-  height: number;
-  width: number;
-}>`
-  height: ${props => props.height}px;
-  width: ${props => props.width}px;
-  position: relative;
-  background-color: #118b81;
-  border-radius: 10%;
 `;
 
 const Row = styled.div<{ gap: number; top: number }>`
@@ -125,7 +92,7 @@ export default function Game() {
       resetCards();
     } else {
       e.target.style.backgroundColor = '#FF0000';
-      e.target.style.pointerEvent = 'none';
+      e.target.style.pointerEvents = 'none';
       setLives(lives - 1);
     }
   };
