@@ -1,175 +1,187 @@
-import { group } from 'console';
-import Fun from 'dataset/sets/Fun';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { Box } from '../components/Box';
-import { Card } from '../components/Card';
-
-// #region constants
-
-const GAME_HEIGHT = 600;
-const GAME_WIDTH = 850;
-const BAR_HEIGHT = 50;
-const CARD_HEIGHT = 120;
-const CARD_WIDTH = GAME_WIDTH / 5;
-const GRAVITY = 2;
-
-// #endregion
-
-// #region css
-
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-`;
-
-const Row = styled.div<{ gap: number; top: number }>`
-  gap: ${props => props.gap}px;
-  top: ${props => props.top}px;
-  position: relative;
-  display: flex;
-  flex-direction: row;
-`;
-
-// #endregion
+import { Game as GameType } from 'phaser';
 
 export default function Game() {
-  const { disneyPrincessTrivia: quizletSet } = Fun.getAllSetsMap();
-  const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(3);
-  const [correctId, setCorrectId] = useState('');
-  const [gameIsActive, setGameIsActive] = useState(false);
-  const [rowPos, setRowPos] = useState(0);
-
-  // makes cards fall
+  const [game, setGame] = useState<GameType>();
   useEffect(() => {
-    let timeId;
-    if (gameIsActive && rowPos + CARD_HEIGHT < GAME_HEIGHT) {
-      timeId = setInterval(() => {
-        setRowPos(rowPos + GRAVITY);
-      }, 12);
-      return () => {
-        clearInterval(timeId);
+    async function initPhaser() {
+      const Phaser = await import('phaser');
+      var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+          default: 'arcade',
+          arcade: {
+            gravity: { y: 300 },
+            debug: false,
+          },
+        },
+        scene: {
+          preload: preload,
+          create: create,
+          update: update,
+        },
       };
-    } else if (gameIsActive) {
-      setLives(lives - 1);
-      resetCards();
+
+      var player;
+      var stars;
+      var bombs;
+      var platforms;
+      var cursors;
+      var score = 0;
+      var gameOver = false;
+      var scoreText;
+
+      var game = new Phaser.Game(config);
+
+      function preload() {
+        this.load.image('sky', '../assets/sky.png');
+        this.load.image('ground', '../assets/platform.png');
+        this.load.image('star', '../assets/star.png');
+        this.load.image('bomb', '../assets/bomb.png');
+        this.load.spritesheet('dude', '../assets/dude.png', {
+          frameWidth: 32,
+          frameHeight: 48,
+        });
+      }
+
+      function create() {
+        //  A simple background for our game
+        this.add.image(400, 300, 'sky');
+
+        //  The platforms group contains the ground and the 2 ledges we can jump on
+        platforms = this.physics.add.staticGroup();
+
+        //  Here we create the ground.
+        //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
+        //  Now let's create some ledges
+        platforms.create(600, 400, 'ground');
+        platforms.create(50, 250, 'ground');
+        platforms.create(750, 220, 'ground');
+
+        // The player and its settings
+        player = this.physics.add.sprite(100, 450, 'dude');
+
+        //  Player physics properties. Give the little guy a slight bounce.
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
+
+        //  Our player animations, turning, walking left and walking right.
+        this.anims.create({
+          key: 'left',
+          frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+          frameRate: 10,
+          repeat: -1,
+        });
+
+        this.anims.create({
+          key: 'turn',
+          frames: [{ key: 'dude', frame: 4 }],
+          frameRate: 20,
+        });
+
+        this.anims.create({
+          key: 'right',
+          frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+          frameRate: 10,
+          repeat: -1,
+        });
+
+        //  Input Events
+        cursors = this.input.keyboard.createCursorKeys();
+
+        //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+        stars = this.physics.add.group({
+          key: 'star',
+          repeat: 11,
+          setXY: { x: 12, y: 0, stepX: 70 },
+        });
+
+        stars.children.iterate(function (child) {
+          //  Give each star a slightly different bounce
+          child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+        });
+
+        bombs = this.physics.add.group();
+
+        //  The score
+        scoreText = this.add.text(16, 16, 'score: 0', {
+          fontSize: '32px',
+          fill: '#000',
+        });
+
+        //  Collide the player and the stars with the platforms
+        this.physics.add.collider(player, platforms);
+        this.physics.add.collider(stars, platforms);
+        this.physics.add.collider(bombs, platforms);
+
+        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+        this.physics.add.overlap(player, stars, collectStar, null, this);
+
+        this.physics.add.collider(player, bombs, hitBomb, null, this);
+      }
+
+      function update() {
+        if (gameOver) {
+          return;
+        }
+        if (cursors.left.isDown) {
+          player.setVelocityX(-160);
+          player.anims.play('left', true);
+        } else if (cursors.right.isDown) {
+          player.setVelocityX(160);
+          player.anims.play('right', true);
+        } else {
+          player.setVelocityX(0);
+          player.anims.play('turn');
+        }
+        if (cursors.up.isDown && player.body.touching.down) {
+          player.setVelocityY(-330);
+        }
+      }
+
+      function collectStar(player, star) {
+        star.disableBody(true, true);
+
+        //  Add and update the score
+        score += 10;
+        scoreText.setText('Score: ' + score);
+
+        if (stars.countActive(true) === 0) {
+          //  A new batch of stars to collect
+          stars.children.iterate(function (child) {
+            child.enableBody(true, child.x, 0, true, true);
+          });
+
+          var x =
+            player.x < 400
+              ? Phaser.Math.Between(400, 800)
+              : Phaser.Math.Between(0, 400);
+
+          var bomb = bombs.create(x, 16, 'bomb');
+          bomb.setBounce(1);
+          bomb.setCollideWorldBounds(true);
+          bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        }
+      }
+
+      function hitBomb(player, bomb) {
+        this.physics.pause();
+
+        player.setTint(0xff0000);
+
+        player.anims.play('turn');
+
+        gameOver = true;
+      }
+
+      setGame(game);
     }
-  }, [gameIsActive, lives, rowPos]);
+    initPhaser();
+  }, []);
 
-  // ends game when lives run out
-  useEffect(() => {
-    if (gameIsActive && lives <= 0) {
-      setGameIsActive(false);
-      resetCards();
-    }
-  }, [gameIsActive, lives]);
-
-  /* if (typeof window !== 'undefined') return null; */
-
-  const getCards = () => {
-    // shuffle cards
-    const shuffled = quizletSet.studiableItem.sort(() => 0.5 - Math.random());
-    // select 3 random cards
-    const selected = shuffled.slice(0, 3);
-    // set the keywords
-    for (var i = 0; i < selected.length; i++) {
-      const word = selected[i].cardSides[0].media[0]['plainText'];
-      document.getElementById(`card-${i}-text`).innerHTML = word;
-    }
-    // select a random correct card
-    const id = Math.floor(Math.random() * 3);
-    setCorrectId(`card-${id}`);
-    // get and set the definition
-    const def = selected[id].cardSides[1].media[0]['plainText'];
-    document.getElementById('def-text').innerHTML = def;
-  };
-
-  // checks if the correct card was selected
-  const handleClick = e => {
-    if (e.target.id == correctId) {
-      setScore(score + 1);
-      resetCards();
-    } else {
-      e.target.style.backgroundColor = '#FF0000';
-      e.target.style.pointerEvents = 'none';
-      setLives(lives - 1);
-    }
-  };
-
-  // starts the game if not yet started
-  const startGame = () => {
-    if (!gameIsActive) {
-      setGameIsActive(true);
-      setScore(0);
-      setLives(3);
-      resetCards();
-    }
-  };
-
-  // resets the row back to the top and gets new cards
-  const resetCards = () => {
-    for (var i = 0; i < 3; i++) {
-      document.getElementById(`card-${i}`).style.pointerEvents = 'auto';
-      document.getElementById(`card-${i}`).style.backgroundColor = '#118b81';
-    }
-    setRowPos(0);
-    getCards();
-  };
-
-  return (
-    <Container onClick={startGame}>
-      <Box
-        height={BAR_HEIGHT}
-        width={GAME_WIDTH}
-        top={0}
-        backgroundColor="#FF0000;"
-      >
-        <span>
-          Score: {score} | Lives: {lives}
-        </span>
-      </Box>
-      <Box
-        height={GAME_HEIGHT}
-        width={GAME_WIDTH}
-        top={BAR_HEIGHT}
-        backgroundColor="#000000;"
-      >
-        <Row gap={CARD_WIDTH} top={rowPos}>
-          <Card
-            id="card-0"
-            height={CARD_HEIGHT}
-            width={CARD_WIDTH}
-            onClick={handleClick}
-          >
-            <span id="card-0-text">Word 0</span>
-          </Card>
-          <Card
-            id="card-1"
-            height={CARD_HEIGHT}
-            width={CARD_WIDTH}
-            onClick={handleClick}
-          >
-            <span id="card-1-text">Word 0</span>
-          </Card>
-          <Card
-            id="card-2"
-            height={CARD_HEIGHT}
-            width={CARD_WIDTH}
-            onClick={handleClick}
-          >
-            <span id="card-2-text">Word 0</span>
-          </Card>
-        </Row>
-      </Box>
-      <Box
-        height={BAR_HEIGHT}
-        width={GAME_WIDTH}
-        top={BAR_HEIGHT + GAME_HEIGHT}
-        backgroundColor="#0000FF;"
-      >
-        <span id="def-text">Definition</span>
-      </Box>
-    </Container>
-  );
+  return <div>Hello World!</div>;
 }
