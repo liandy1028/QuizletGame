@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 
 export class MainScene extends Scene {
-  player;
+  player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
   stars;
   bombs;
   platforms;
@@ -126,6 +126,19 @@ export class MainScene extends Scene {
     }
     if (this.cursors.up.isDown && this.player.body.touching.down) {
       this.player.setVelocityY(-330);
+    }
+
+    let activePointer = this.input.activePointer;
+
+    let xPos = this.player.body.position.x;
+    let targetxPos = activePointer.position.x;
+
+    if (activePointer.isDown) {
+      if (xPos > targetxPos) {
+        this.player.setVelocityX(-160);
+      } else {
+        this.player.setVelocityX(160);
+      }
     }
   }
 
