@@ -2,22 +2,21 @@ import { group } from 'console';
 import Fun from 'dataset/sets/Fun';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import GameComponent from './game'
+import GameComponent from '../components/game'
 
-
-// #region constants
-
-const GAME_HEIGHT = 600;
-const GAME_WIDTH = 850;
-const BAR_HEIGHT = 50;
-const CARD_HEIGHT = 120;
-const CARD_WIDTH = GAME_WIDTH / 5;
-const GRAVITY = 2;
-
-// #endregion
 
 // #region css
 
+const GameWindow = styled.div`
+  margin: auto;
+  width: 50%;
+  
+`
+
+const Banner = styled.div`
+  text-align: center;
+  font-size: 50px;
+`
 
 // #endregion
 
@@ -30,9 +29,11 @@ export default function MainPage() {
   const [rowPos, setRowPos] = useState(0);
 
   return (
-    <div>
-      <GameComponent></GameComponent>
-      <div id="phaser-game-content"></div>
-    </div>
+    <>
+      <Banner>This is the greatest game</Banner>
+      <GameWindow id="phaser-game-content">
+        <GameComponent></GameComponent>
+      </GameWindow>
+    </>
   );
 }

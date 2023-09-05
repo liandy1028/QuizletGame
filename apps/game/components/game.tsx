@@ -190,5 +190,5 @@ export default function GameComponent() {
     phaserGameRef.current = initPhaser()
   }, [] /* only run once; config ref elided on purpose */);
 
-  return <div>Hello World!</div>;
+  return <></>
 }
