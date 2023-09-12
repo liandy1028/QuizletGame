@@ -1,11 +1,13 @@
 import { Scene } from 'phaser';
-import * as Assets from './AssetConstants';
+import { Assets, Scenes, Registry } from './constants';
+
+import Quizlet from 'dataset';
 
 type sprite = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
 export class Preloader extends Scene {
   constructor() {
-    super('preloader');
+    super(Scenes.PRELOADER_SCENE);
   }
 
   preload() {
@@ -13,15 +15,16 @@ export class Preloader extends Scene {
     this.load.on('progress', this.onProgress, this);
     this.load.on('fileprogress', this.onFileProgress, this);
 
+    // Load quizlet
+    const quizletSets = Quizlet.getAllSets();
+    let usedDataset = quizletSets[0];
+
+    this.registry.set(Registry.USED_QUIZLET_DATASET, usedDataset);
+
+    // Load game assets
     this.load.setPath('game/assets');
     this.load.image(Assets.SKY_IMAGE, 'sky.png');
-    this.load.image(Assets.GROUND_IMAGE, 'platform.png');
     this.load.image(Assets.STAR_IMAGE, 'star.png');
-    this.load.image(Assets.BOMB_IMAGE, 'bomb.png');
-    this.load.spritesheet(Assets.DUDE_IMAGE, 'dude.png', {
-      frameWidth: 32,
-      frameHeight: 48,
-    });
   }
 
   onProgress(loadProgress: number) {
@@ -40,35 +43,6 @@ export class Preloader extends Scene {
   }
 
   create() {
-    //  Our player animations, turning, walking left and walking right.
-    this.anims.create({
-      key: Assets.PLAYER_LEFT_ANIM,
-      frames: this.anims.generateFrameNumbers(Assets.DUDE_IMAGE, {
-        start: 0,
-        end: 3,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: Assets.PLAYER_TURN_ANIM,
-      frames: [{ key: Assets.DUDE_IMAGE, frame: 4 }],
-      frameRate: 20,
-    });
-
-    this.anims.create({
-      key: Assets.PLAYER_RIGHT_ANIM,
-      frames: this.anims.generateFrameNumbers(Assets.DUDE_IMAGE, {
-        start: 5,
-        end: 8,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.scene.start('main-scene');
+    this.scene.start(Scenes.MAIN_SCENE);
   }
-
-  update() {}
 }

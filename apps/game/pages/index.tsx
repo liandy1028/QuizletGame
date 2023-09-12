@@ -1,12 +1,12 @@
 import { group } from 'console';
-import Fun from 'dataset/sets/Fun';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 
+// Dynamically load game component to prevent errors with importing phaser synchronously
 const GameComponent = dynamic(() => import('../components/game'), {
   ssr: false,
-  loading: () => <p>Loading...</p>,
+  loading: () => <LoadingDiv>Loading...</LoadingDiv>,
 });
 
 // #region css
@@ -25,19 +25,19 @@ const Banner = styled.div`
   font-size: 50px;
 `;
 
+const LoadingDiv = styled.div`
+  margin: auto;
+  width: 75%;
+  text-align: center;
+  font-size: 50px;
+`;
+
 // #endregion
 
 export default function MainPage() {
-  const { disneyPrincessTrivia: quizletSet } = Fun.getAllSetsMap();
-  const [score, setScore] = useState(0);
-  const [lives, setLives] = useState(3);
-  const [correctId, setCorrectId] = useState('');
-  const [gameIsActive, setGameIsActive] = useState(false);
-  const [rowPos, setRowPos] = useState(0);
-
   return (
     <>
-      <Banner>This is the greatest game probably</Banner>
+      <Banner>This is the greatest game </Banner>
       <GameWindow id="phaser-game-content">
         <GameComponent></GameComponent>
       </GameWindow>

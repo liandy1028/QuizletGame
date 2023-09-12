@@ -1,14 +1,15 @@
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
-import { Preloader, MainScene } from '../scenes';
+import { Preloader, MainScene, MainUIScene } from '../scenes';
 
 export default function GameComponent() {
   function initPhaser() {
     var config = {
-      type: Phaser.AUTO,
+      type: Phaser.CANVAS,
       width: 800,
       height: 600,
       parent: 'phaser-game-content',
+      canvas: document.getElementById('canvas') as HTMLCanvasElement,
       physics: {
         default: 'arcade',
         arcade: {
@@ -16,7 +17,7 @@ export default function GameComponent() {
           debug: false,
         },
       },
-      scene: [Preloader, MainScene],
+      scene: [Preloader, MainScene, MainUIScene],
     };
     var game = new Phaser.Game(config);
 
@@ -24,16 +25,17 @@ export default function GameComponent() {
   }
 
   // Make sure the game is only initialized once
-  const phaserGameRef = useRef(null);
+  const phaserGameRef = useRef<Phaser.Game>(null);
   useEffect(
     () => {
       if (phaserGameRef.current) {
         return;
       }
+
       phaserGameRef.current = initPhaser();
     },
     [] /* only run once; config ref elided on purpose */
   );
 
-  return <></>;
+  return <canvas id="canvas" width="800" height="600"></canvas>;
 }
