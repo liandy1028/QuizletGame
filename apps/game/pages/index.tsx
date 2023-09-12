@@ -2,7 +2,12 @@ import { group } from 'console';
 import Fun from 'dataset/sets/Fun';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import GameComponent from '../components/game';
+import dynamic from 'next/dynamic';
+
+const GameComponent = dynamic(() => import('../components/game'), {
+  ssr: false,
+  loading: () => <p>Loading...</p>,
+});
 
 // #region css
 

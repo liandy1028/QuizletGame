@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import Phaser from 'phaser';
+import { Preloader, MainScene } from '../scenes';
 
 export default function GameComponent() {
-  async function initPhaser() {
-    const Phaser = await import('phaser');
-    const { Preloader } = await import('../scenes/Preloader');
-    const { MainScene } = await import('../scenes/MainScene');
+  function initPhaser() {
     var config = {
       type: Phaser.AUTO,
       width: 800,
