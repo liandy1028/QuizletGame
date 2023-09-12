@@ -1,7 +1,10 @@
 import { Scene } from 'phaser';
+import * as Assets from './AssetConstants';
+
+type sprite = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
 export class MainScene extends Scene {
-  player: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+  player: sprite;
   stars;
   bombs;
   platforms;
@@ -10,67 +13,44 @@ export class MainScene extends Scene {
   gameOver = false;
   scoreText;
 
-  preload() {
-    this.load.image('sky', 'game/assets/sky.png');
-    this.load.image('ground', 'game/assets/platform.png');
-    this.load.image('star', 'game/assets/star.png');
-    this.load.image('bomb', 'game/assets/bomb.png');
-    this.load.spritesheet('dude', 'game/assets/dude.png', {
-      frameWidth: 32,
-      frameHeight: 48,
-    });
+  constructor() {
+    super('main-scene');
   }
 
+  preload() {}
+
   create() {
-    //  A simple background for our game
-    this.add.image(400, 300, 'sky');
+    //  Assets.A simple background for our game
+    this.add.image(400, 300, Assets.SKY_IMAGE);
 
     //  The platforms group contains the ground and the 2 ledges we can jump on
     this.platforms = this.physics.add.staticGroup();
 
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    this.platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    this.platforms
+      .create(400, 568, Assets.GROUND_IMAGE)
+      .setScale(2)
+      .refreshBody();
 
     //  Now let's create some ledges
-    this.platforms.create(600, 400, 'ground');
-    this.platforms.create(50, 250, 'ground');
-    this.platforms.create(750, 220, 'ground');
+    this.platforms.create(600, 400, Assets.GROUND_IMAGE);
+    this.platforms.create(50, 250, Assets.GROUND_IMAGE);
+    this.platforms.create(750, 220, Assets.GROUND_IMAGE);
 
     // The player and its settings
-    this.player = this.physics.add.sprite(100, 450, 'dude');
+    this.player = this.physics.add.sprite(100, 450, Assets.DUDE_IMAGE);
 
     //  Player physics properties. Give the little guy a slight bounce.
     this.player.setBounce(0.2);
     this.player.setCollideWorldBounds(true);
-
-    //  Our player animations, turning, walking left and walking right.
-    this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    this.anims.create({
-      key: 'turn',
-      frames: [{ key: 'dude', frame: 4 }],
-      frameRate: 20,
-    });
-
-    this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1,
-    });
 
     //  Input Events
     this.cursors = this.input.keyboard.createCursorKeys();
 
     //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
     this.stars = this.physics.add.group({
-      key: 'star',
+      key: Assets.STAR_IMAGE,
       repeat: 11,
       setXY: { x: 12, y: 0, stepX: 70 },
     });
@@ -116,13 +96,13 @@ export class MainScene extends Scene {
     }
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-160);
-      this.player.anims.play('left', true);
+      this.player.anims.play(Assets.PLAYER_LEFT_ANIM, true);
     } else if (this.cursors.right.isDown) {
       this.player.setVelocityX(160);
-      this.player.anims.play('right', true);
+      this.player.anims.play(Assets.PLAYER_RIGHT_ANIM, true);
     } else {
       this.player.setVelocityX(0);
-      this.player.anims.play('turn');
+      this.player.anims.play(Assets.PLAYER_TURN_ANIM);
     }
     if (this.cursors.up.isDown && this.player.body.touching.down) {
       this.player.setVelocityY(-330);
@@ -150,7 +130,7 @@ export class MainScene extends Scene {
     this.scoreText.setText('Score: ' + this.score);
 
     if (this.stars.countActive(true) === 0) {
-      //  A new batch of stars to collect
+      //  Assets.A new batch of stars to collect
       this.stars.children.iterate(function (child) {
         child.enableBody(true, child.x, 0, true, true);
       });
@@ -160,7 +140,7 @@ export class MainScene extends Scene {
           ? Phaser.Math.Between(400, 800)
           : Phaser.Math.Between(0, 400);
 
-      var bomb = this.bombs.create(x, 16, 'bomb');
+      var bomb = this.bombs.create(x, 16, Assets.BOMB_IMAGE);
       bomb.setBounce(1);
       bomb.setCollideWorldBounds(true);
       bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
@@ -172,7 +152,7 @@ export class MainScene extends Scene {
 
     player.setTint(0xff0000);
 
-    player.anims.play('turn');
+    player.anims.play(Assets.PLAYER_TURN_ANIM);
 
     this.gameOver = true;
   }

@@ -32,7 +32,7 @@ export default function MainPage() {
 
   return (
     <>
-      <Banner>This is the greatest game</Banner>
+      <Banner>This is the greatest game probably</Banner>
       <GameWindow id="phaser-game-content">
         <GameComponent></GameComponent>
       </GameWindow>

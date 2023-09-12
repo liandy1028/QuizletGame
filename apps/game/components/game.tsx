@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 export default function GameComponent() {
   async function initPhaser() {
     const Phaser = await import('phaser');
+    const { Preloader } = await import('../scenes/Preloader');
     const { MainScene } = await import('../scenes/MainScene');
     var config = {
       type: Phaser.AUTO,
@@ -16,7 +17,7 @@ export default function GameComponent() {
           debug: false,
         },
       },
-      scene: [MainScene],
+      scene: [Preloader, MainScene],
     };
     var game = new Phaser.Game(config);
 
@@ -27,9 +28,7 @@ export default function GameComponent() {
   const phaserGameRef = useRef(null);
   useEffect(
     () => {
-      console.log('useEffect');
       if (phaserGameRef.current) {
-        console.log('game instance exists');
         return;
       }
       phaserGameRef.current = initPhaser();
