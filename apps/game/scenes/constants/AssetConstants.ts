@@ -1,11 +1,17 @@
-// Images
-export const SKY_IMAGE = 'sky';
-export const GROUND_IMAGE = 'ground';
-export const STAR_IMAGE = 'star';
-export const BOMB_IMAGE = 'bomb';
-export const DUDE_IMAGE = 'dude';
+export const Images = {
+  CARD: 'chargingattack.png',
+  TARGET_INDICATOR: 'targetIndicator.png',
+  STAR: 'star.png',
+  DUMMY_ENEMY: 'dummyEnemy.png',
+  PLAYER: 'player.png',
+};
 
-// Animations
-export const PLAYER_LEFT_ANIM = 'player_left_anim';
-export const PLAYER_RIGHT_ANIM = 'player_right_anim';
-export const PLAYER_TURN_ANIM = 'player_turn_anim';
+export const SpriteSheets = {
+  MAIN_SCENE_BACKGROUND: 'mockup.png',
+  GAME_OVER_BACKGROUND: 'gameoverbackground.png',
+};
+
+export const Anims = {
+  MAIN_SCENE_BACKGROUND: 'main-scene-bg',
+  GAME_OVER_BACKGROUND: 'game-over-bg',
+};

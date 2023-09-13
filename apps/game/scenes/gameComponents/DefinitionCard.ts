@@ -1,48 +1,38 @@
 import { Scene } from 'phaser';
 import { Assets, GameEvents } from '../constants';
+import { GameStudiableItem } from '../types';
 
-export default class DefinitionCard {
-  constructor(front: string, back: string, scene: Scene) {
-    const x = Phaser.Math.Between(0, 800);
-    const y = Phaser.Math.Between(0, 600);
-
+export default class DefinitionCard extends Phaser.GameObjects.Container {
+  constructor(studiableItem: GameStudiableItem, scene: Scene) {
+    super(scene);
+    scene.add.existing(this);
+    this.studiableItem = studiableItem;
     this.cardBackground = scene.add
-      .sprite(0, 0, Assets.STAR_IMAGE)
-      .setName('background');
+      .sprite(0, 0, Assets.Images.CARD)
+      .setName('background')
+      .setScale(3);
 
     this.cardText = scene.add
-      .text(0, 0, front + '\n' + back, {
-        color: '#000000',
-      })
+      .text(
+        0,
+        0,
+        this.studiableItem.word.text +
+          '\n' +
+          this.studiableItem.definition.text,
+        {
+          color: '#000000',
+        }
+      )
       .setName('text');
 
-    this.cardContainer = scene.add
-      .container(0, 0, [this.cardText, this.cardBackground])
-      .setName('container')
-      .setX(x)
-      .setY(y)
-      .setSize(50, 50)
-      .setInteractive();
-
-    this.cardContainer.on('pointerup', this.clickHandler, this);
+    this.add([this.cardBackground, this.cardText]);
+    this.setSize(
+      this.cardBackground.displayWidth,
+      this.cardBackground.displayHeight
+    );
   }
 
-  destroy() {
-    this.cardContainer.destroy();
-  }
-
+  studiableItem: GameStudiableItem;
   cardBackground: Phaser.GameObjects.Sprite;
   cardText: Phaser.GameObjects.Text;
-  cardContainer: Phaser.GameObjects.Container;
-
-  onClickEvent = new Phaser.Events.EventEmitter();
-
-  clickHandler() {
-    let textObject = this.cardText;
-    console.log(textObject.text + ' Clicked');
-    this.cardContainer.input.enabled = false;
-    this.destroy();
-
-    this.onClickEvent.emit(GameEvents.CARD_CLICKED);
-  }
 }

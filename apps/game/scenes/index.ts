@@ -1,5 +1,6 @@
 import { MainScene } from './MainScene';
-import { Preloader } from './Preloader';
+import { PreloaderScene } from './PreloaderScene';
 import { MainUIScene } from './MainUIScene';
+import { GameOverScene } from './GameOverScene';
 
-export { MainScene, Preloader, MainUIScene };
+export { MainScene, PreloaderScene as Preloader, MainUIScene, GameOverScene };

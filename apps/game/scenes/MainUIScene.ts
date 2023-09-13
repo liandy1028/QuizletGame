@@ -12,14 +12,12 @@ export class MainUIScene extends Scene {
   scoreTextGameObject: text;
 
   textStyle: Phaser.Types.GameObjects.Text.TextStyle = {
-    color: '#000000',
+    color: '#FFFFF',
     fontSize: 25,
   };
 
   create() {
     this.scoreTextGameObject = this.add.text(0, 0, 'Score: ', this.textStyle);
-
-    console.log('UI SCENE');
 
     const mainScene = this.scene.get(Scenes.MAIN_SCENE);
 

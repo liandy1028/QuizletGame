@@ -37,7 +37,6 @@ const LoadingDiv = styled.div`
 export default function MainPage() {
   return (
     <>
-      <Banner>This is the greatest game </Banner>
       <GameWindow id="phaser-game-content">
         <GameComponent></GameComponent>
       </GameWindow>

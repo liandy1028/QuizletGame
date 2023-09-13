@@ -1,6 +1,24 @@
-import { Scene } from 'phaser';
-import { Assets, Scenes, Registry, GameEvents } from './constants';
-import { DefinitionCard } from './gameComponents';
+import { Game, Scene } from 'phaser';
+import {
+  Assets,
+  Scenes,
+  Registry,
+  GameEvents,
+  SortingLayers,
+} from './constants';
+import {
+  AnimatedBackground,
+  DefinitionCard,
+  EnemyEntity,
+  PlayerEntity,
+} from './gameComponents';
+import {
+  EnemyManager,
+  GameDirector,
+  HandManager,
+  QuizletSetBank,
+} from './systems';
+
 type GameObject = Phaser.GameObjects.GameObject;
 
 export class MainScene extends Scene {
@@ -10,37 +28,71 @@ export class MainScene extends Scene {
     this.score = 0;
   }
 
+  // State
   score: number;
+  isGameOver: boolean;
+
+  // Dependencies
+  enemyManager: EnemyManager;
+  handManager: HandManager;
+  player: PlayerEntity;
+  gameDirector: GameDirector;
 
   create() {
-    // Setup quizlet studiable Items
+    this.initializeSystems();
+    this.createBackground();
+    this.setupEvents();
 
-    let usedStudiableItems = this.registry.get(
-      Registry.USED_QUIZLET_DATASET
-    ).studiableItem;
-    //  Assets.A simple background for our game
-    this.add.image(400, 300, Assets.SKY_IMAGE);
-
-    for (const studiableItem of usedStudiableItems) {
-      let card = new DefinitionCard(
-        studiableItem.cardSides[0].media[0]['plainText'],
-        studiableItem.cardSides[1].media[0]['plainText'],
-        this
-      );
-
-      card.onClickEvent.addListener(
-        GameEvents.CARD_CLICKED,
-        () => {
-          console.log('hitem with it');
-          this.score += 1;
-          this.events.emit(GameEvents.SCORE_ADD_EVENT, this.score);
-        },
-        this
-      );
-    }
     // Additively loads UI scene
     this.scene.launch(Scenes.MAIN_UI_SCENE);
   }
 
-  update() {}
+  update(time: number, deltaTime: number) {
+    if (this.isGameOver) return;
+    this.enemyManager.update(deltaTime);
+    this.gameDirector.update(deltaTime);
+    this.handManager.update(deltaTime);
+  }
+
+  private createBackground() {
+    let bg = new AnimatedBackground(this, Assets.Anims.MAIN_SCENE_BACKGROUND);
+  }
+
+  private initializeSystems() {
+    let quizletSetBank: QuizletSetBank = this.registry.get(
+      Registry.QUIZLET_SET_BANK
+    );
+
+    this.player = new PlayerEntity(this);
+    this.enemyManager = new EnemyManager(this, this.player);
+    this.gameDirector = new GameDirector(
+      quizletSetBank,
+      this.enemyManager,
+      this
+    );
+
+    this.handManager = new HandManager(5, this)
+      .setPosition(200, 600)
+      .setSize(600, 50);
+  }
+
+  private setupEvents() {
+    this.events.addListener(
+      GameEvents.ENEMY_TOUCHED_PLAYER,
+      this.onPlayerKilled,
+      this
+    );
+  }
+
+  private onPlayerKilled(player: PlayerEntity, enemy: EnemyEntity) {
+    this.handleGameOver();
+  }
+
+  private handleGameOver() {
+    if (this.isGameOver) return;
+    console.warn('Game over!');
+    this.isGameOver = true;
+    this.scene.stop(Scenes.MAIN_UI_SCENE);
+    this.scene.start(Scenes.GAME_OVER_SCENE);
+  }
 }
