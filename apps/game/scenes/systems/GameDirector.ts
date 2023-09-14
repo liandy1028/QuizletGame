@@ -8,6 +8,8 @@ import TargetIndicatorEntity from '../gameComponents/TargetIndicatorEntity';
 import HandManager from './HandManager';
 import { EnemyEntity } from '../gameComponents';
 import { GameStudiableItem } from '../types';
+import { EffectConfigs } from '../configs';
+import ComboManager from './ComboManager';
 
 export default class GameDirector {
   constructor(
@@ -15,12 +17,14 @@ export default class GameDirector {
     enemyManager: EnemyManager,
     targetIndicator: TargetIndicatorEntity,
     handManager: HandManager,
+    comboManager: ComboManager,
     scene: Scene
   ) {
     this.quizletSetBank = quizletSetBank;
     this.enemyManager = enemyManager;
     this.targetIndicator = targetIndicator;
     this.handManager = handManager;
+    this.comboManager = comboManager;
 
     this.scene = scene;
 
@@ -39,6 +43,7 @@ export default class GameDirector {
   enemyManager: EnemyManager;
   targetIndicator: TargetIndicatorEntity;
   handManager: HandManager;
+  comboManager: ComboManager;
 
   // State
   currentTarget: EnemyEntity;
@@ -63,9 +68,18 @@ export default class GameDirector {
 
   private cardClickedHandler(studiableItem: GameStudiableItem) {
     if (studiableItem.word.text == this.targetIndicator.termText.text) {
-      this.currentTarget.takeDamage(1);
+      this.currentTarget.takeDamage(this.comboManager.getCurrentComboDamage());
+      this.comboManager.comboUp();
+
       this.setupNewAttack();
     } else {
+      let shakeConfig = EffectConfigs.INCORRECT_MATCH_SCREEN_SHAKE_CONFIG;
+      this.scene.cameras.main.shake(
+        shakeConfig.duration,
+        shakeConfig.intensity
+      );
+      this.comboManager.comboDown();
+
       this.handManager.setAllowSelection(false);
       this.scene.time.delayedCall(1000, () => {
         this?.handManager?.setAllowSelection(true);

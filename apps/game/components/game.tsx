@@ -10,7 +10,7 @@ export default function GameComponent() {
       height: 720,
       parent: 'phaser-game-content',
       canvas: document.getElementById('canvas') as HTMLCanvasElement,
-      antialias: false,
+      antialias: true,
       physics: {
         default: 'arcade',
         arcade: {

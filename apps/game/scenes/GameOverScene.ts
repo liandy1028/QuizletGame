@@ -1,6 +1,7 @@
 import { Scene } from 'phaser';
 import { Assets, Scenes, Registry, GameEvents } from './constants';
 import { AnimatedBackground } from './gameComponents';
+import { BackgroundConfigs } from './configs';
 
 type text = Phaser.GameObjects.Text;
 
@@ -26,7 +27,10 @@ export class GameOverScene extends Scene {
       .setAlign('left')
       .setInteractive();
 
-    let bg = new AnimatedBackground(this, Assets.Anims.GAME_OVER_BACKGROUND);
+    let bg = new AnimatedBackground(
+      this,
+      BackgroundConfigs.GAME_OVER_BACKGROUND_CONFIG
+    );
 
     this.scoreTextGameObject.on(
       Phaser.Input.Events.GAMEOBJECT_POINTER_UP,

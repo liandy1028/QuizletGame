@@ -35,7 +35,7 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
     this.add([this.sprite, this.healthBar]);
     this.setSize(120, 120);
     this.setX(scene.cameras.main.width);
-    this.setY(300);
+    this.setY(200);
     this.setName('enemyEntity');
     this.setDepth(SortingLayers.ENEMY_SPRITE);
 
@@ -120,11 +120,6 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
   }
 
   private switchState(newState: string) {
-    switch (this.currentState) {
-      case EnemyStates.Stunned:
-        this.sprite.clearTint();
-        break;
-    }
 
     switch (newState) {
       case EnemyStates.Dead:
@@ -132,11 +127,8 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
         this.markedForDeath = true;
         this.sprite.on(
           Phaser.Animations.Events.ANIMATION_COMPLETE,
-          function () {
-            console.log('DESTROY');
-            this.emit(GameEvents.ENEMY_DIED, this);
-            this.destroy();
-          }
+          this.handleDeath,
+          this
         );
         break;
       case EnemyStates.Moving:
@@ -144,7 +136,6 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
         break;
       case EnemyStates.Stunned:
         this.sprite.play(this.enemyConfig.stunnedAnim.key);
-        this.sprite.setTint(0xff0000);
         break;
     }
     this.currentState = newState;
@@ -160,13 +151,14 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
 
     this.damageTintTimer = this.enemyConfig.damageStunnedDuration;
     if (this.currentHealth <= 0) {
-      this.handleDeath();
+      this.switchState(EnemyStates.Dead);
     } else {
       this.switchState(EnemyStates.Stunned);
     }
   }
 
   private handleDeath() {
-    this.switchState(EnemyStates.Dead);
+    this.emit(GameEvents.ENEMY_DIED, this);
+    this.destroy();
   }
 }

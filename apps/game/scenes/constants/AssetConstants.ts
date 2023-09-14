@@ -1,18 +1,11 @@
 export const Images = {
-  CARD: 'chargingattack.png',
+  CARD: 'definitionCard.png',
   TARGET_INDICATOR: 'targetIndicator.png',
   STAR: 'star.png',
   PLAYER: 'player.png',
-  HEALTH_ICON: 'healthPoint.png',
 };
 
-export const SpriteSheets = {
-  MAIN_SCENE_BACKGROUND: 'mockup.png',
-  GAME_OVER_BACKGROUND: 'gameoverbackground.png',
-};
+export const SpriteSheets = {};
 
-export const Anims = {
-  MAIN_SCENE_BACKGROUND: 'main-scene-bg',
-  GAME_OVER_BACKGROUND: 'game-over-bg',
-};
+export const Anims = {};
 export const SPRITE_SCALE = 3;

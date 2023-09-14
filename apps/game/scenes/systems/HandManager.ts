@@ -20,14 +20,15 @@ export default class HandManager extends Phaser.GameObjects.Container {
     this.cards = [];
     this.heldCards = [];
     while (this.cards.length < 2 * this.size) {
-      let definitionCards = this.quizletSetBank.getRandomizedStudiableItems();
-      for (const definitionCard of definitionCards) {
-        this.cards.push(
-          new DefinitionCard(definitionCard, this.scene)
-            .setActive(false)
-            .setVisible(false)
-        );
-      }
+      // let definitionCards = this.quizletSetBank.getRandomizedStudiableItems();
+      // for (const definitionCard of definitionCards) {
+      //   this.cards.push(
+      //     new DefinitionCard(definitionCard, this.scene)
+      //       .setActive(false)
+      //       .setVisible(false)
+      //   );
+      // }
+      this.cards = this.quizletSetBank.getRandomizedStudiableItems();
     }
   }
 
@@ -35,7 +36,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
   quizletSetBank: QuizletSetBank;
   scene: Scene;
   size: number;
-  cards: DefinitionCard[];
+  cards: GameStudiableItem[];
   heldCards: DefinitionCard[];
 
   allowSelection = true;
@@ -49,7 +50,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
   }
 
   private requesting = false;
-  private requestCooldown = 400;
+  private requestCooldown = 200;
   private requestCard() {
     if (this.requesting) return;
     this.requesting = true;
@@ -57,7 +58,8 @@ export default class HandManager extends Phaser.GameObjects.Container {
       this.requesting = false;
     });
 
-    let card = this.cards.shift();
+    // let card = this.cards.shift();
+    let card = new DefinitionCard(this.cards.shift(), this.scene);
     this.add(card);
     this.heldCards.push(card);
 
@@ -99,12 +101,13 @@ export default class HandManager extends Phaser.GameObjects.Container {
   private moveSpeed = 200;
   private maxRot = 20;
   private updateCardPositions() {
+    if (this.heldCards.length == 0) return;
     let handWidth = Math.min(
-      this.cards[0].width * this.length * 0.8,
+      this.heldCards[0].width * this.length * 0.8,
       this.width
     );
     let cardSpacing =
-      handWidth / (this.heldCards.length + (this.focused ? 2 : 0));
+      handWidth / (this.heldCards.length + (this.focused ? 1 : 0));
     let x = -handWidth / 2 + cardSpacing / 2;
     for (let card of this.heldCards) {
       let config: Phaser.Types.Tweens.TweenBuilderConfig = {
@@ -117,7 +120,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
         ease: Phaser.Math.Easing.Quartic.Out,
       };
       if (this.focused === card) {
-        x += cardSpacing;
+        x += cardSpacing / 2;
         config.x = x;
         config.y = -this.height;
         config.scale = 1.1;
@@ -127,7 +130,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
 
       x += cardSpacing;
       if (this.focused === card) {
-        x += cardSpacing * 1.2;
+        x += cardSpacing / 2;
       }
       this.bringToTop(card);
     }
@@ -136,7 +139,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
 
   private focused: DefinitionCard;
   public update(deltaTime: number) {
-    if (this.length < this.size) {
+    if (this.heldCards.length < this.size) {
       const newLocal = this;
       newLocal.requestCard();
     }
@@ -152,7 +155,8 @@ export default class HandManager extends Phaser.GameObjects.Container {
       this.heldCards.splice(index, 1);
     }
 
-    this.cards.push(card);
+    // this.cards.push(card);
+    this.cards.push(card.studiableItem);
 
     this.emit(GameEvents.CARD_CLICKED, card.studiableItem);
 
@@ -161,6 +165,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
       onComplete: () => {
         this.remove(card);
         card.setActive(false).setVisible(false);
+        card.destroy();
       },
     });
   }
@@ -210,14 +215,16 @@ export default class HandManager extends Phaser.GameObjects.Container {
     }
     let i = 0;
     while (currentHand.length < this.size) {
-      currentHand.push(this.cards[i++].studiableItem);
+      // currentHand.push(this.cards[i++].studiableItem);
+      currentHand.push(this.cards[i++]);
     }
 
     let ret = new Array<GameStudiableItem>();
     while (ret.length < size) {
       let ind = Phaser.Math.Between(0, this.size - 1);
       ret.push(currentHand[ind]);
-      currentHand[i] = this.cards[i++].studiableItem;
+      // currentHand[i] = this.cards[i++].studiableItem;
+      currentHand[i] = this.cards[i++];
     }
     return ret;
   }

@@ -28,10 +28,10 @@ export default class QuizletSetBank {
         definition: { text: studiableItem.cardSides[1].media[0]['plainText'] },
       };
       if (studiableItem.cardSides[1].media.length > 1) {
-        this.loader.image(
-          studiableItem.cardSides[1].media[1]['url'],
-          studiableItem.cardSides[1].media[1]['url']
-        );
+        // this.loader.image(
+        //   studiableItem.cardSides[1].media[1]['url'],
+        //   studiableItem.cardSides[1].media[1]['url']
+        // );
         gameStudiableItem.definition.imageID =
           studiableItem.cardSides[1].media[1]['url'];
       }

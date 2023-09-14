@@ -18,7 +18,7 @@ export default class PlayerEntity extends Phaser.GameObjects.Container {
     this.add([this.sprite]);
     this.setSize(50, 125);
     this.setX(100);
-    this.setY(300);
+    this.setY(200);
     this.setName('playerEntity');
     this.setDepth(SortingLayers.PLAYER_SPRITE);
 

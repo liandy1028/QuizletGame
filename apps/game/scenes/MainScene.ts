@@ -19,23 +19,24 @@ import {
   QuizletSetBank,
 } from './systems';
 import TargetIndicatorEntity from './gameComponents/TargetIndicatorEntity';
+import { CONFIG_FILES } from 'next/dist/shared/lib/constants';
+import { BackgroundConfigs } from './configs';
+import ComboManager from './systems/ComboManager';
 
 type GameObject = Phaser.GameObjects.GameObject;
 
 export class MainScene extends Scene {
   constructor() {
     super(Scenes.MAIN_SCENE);
-
-    this.score = 0;
   }
 
   // State
-  score: number;
   isGameOver: boolean;
 
   // Components
   enemyManager: EnemyManager;
   handManager: HandManager;
+  comboManager : ComboManager;
   player: PlayerEntity;
   gameDirector: GameDirector;
   targetIndicator: TargetIndicatorEntity;
@@ -56,10 +57,11 @@ export class MainScene extends Scene {
     this.gameDirector.update(deltaTime);
     this.handManager.update(deltaTime);
     this.targetIndicator.update(deltaTime);
+    this.comboManager.update(deltaTime);
   }
 
   private createBackground() {
-    let bg = new AnimatedBackground(this, Assets.Anims.MAIN_SCENE_BACKGROUND);
+    let bg = new AnimatedBackground(this, BackgroundConfigs.MAIN_BACKGROUND_CONFIG);
   }
 
   private initializeSystems() {
@@ -75,14 +77,17 @@ export class MainScene extends Scene {
 
     this.handManager = new HandManager(5, this)
       .setPosition(this.cameras.main.width / 2, 600)
-      .setSize(this.cameras.main.width * 0.6, 50)
+      .setSize(this.cameras.main.width * 0.8, 50)
       .setDepth(SortingLayers.HAND);
+
+    this.comboManager = new ComboManager(this);
 
     this.gameDirector = new GameDirector(
       quizletSetBank,
       this.enemyManager,
       this.targetIndicator,
       this.handManager,
+      this.comboManager,
       this
     );
   }

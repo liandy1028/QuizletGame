@@ -69,5 +69,11 @@ export default class EnemyManager {
     // Delete enemy from update list
     let index = this.currentEnemies.findIndex(x => x == enemy);
     this.currentEnemies.splice(index, 1);
+
+    // Award points
+    this.scene.events.emit(
+      GameEvents.SCORE_ADD_EVENT,
+      enemy.enemyConfig.pointReward
+    );
   }
 }

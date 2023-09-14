@@ -2,9 +2,10 @@ import { Assets } from '../constants';
 import { EnemyConfig } from '../types';
 
 export const TEST_ENEMY: EnemyConfig = {
-  maxHealth: 3,
-  speed: 60,
+  maxHealth: 2,
+  speed: 50,
   damageStunnedDuration: 1000,
+  pointReward : 10,
 
   // Animations
   spriteSheetPath: 'dummyEnemy.png',
@@ -27,7 +28,7 @@ export const TEST_ENEMY: EnemyConfig = {
   deathAnim: {
     key: 'dummyEnemy-death',
     frameNumbers: [3, 4, 5, 6, 7],
-    frameRate: 3,
+    frameRate: 8,
     repeat: 0,
   },
 };

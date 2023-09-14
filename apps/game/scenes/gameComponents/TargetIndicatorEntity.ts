@@ -52,7 +52,10 @@ export default class TargetIndicatorEntity extends Phaser.GameObjects
 
   update(deltaTime: number) {
     // Move towards the target
-    this.setVisible(this.currentTarget != null);
+    this.setVisible(
+      this.currentTarget != null && !this.currentTarget.markedForDeath
+    );
+
     if (this.currentTarget != null) {
       this.x = this.currentTarget.x;
       this.y = this.currentTarget.y;
@@ -67,8 +70,8 @@ export default class TargetIndicatorEntity extends Phaser.GameObjects
     this.termText.text = text;
 
     let fontSize = 35;
-    let heightBound = 150;
-    let widthBound = 145;
+    let heightBound = 100;
+    let widthBound = 300;
 
     this.termText.setWordWrapWidth(widthBound).setFontSize(fontSize);
 

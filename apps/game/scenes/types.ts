@@ -13,6 +13,8 @@ export type EnemyConfig = {
   maxHealth: number;
   speed: number;
   damageStunnedDuration: number;
+  pointReward: number;
+
   // Spritesheet (reuse filepath as key)
   spriteSheetPath: string;
   spriteSheetFrameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig;
@@ -21,6 +23,32 @@ export type EnemyConfig = {
   moveAnim: GameAnimationConfig;
   stunnedAnim: GameAnimationConfig;
   deathAnim: GameAnimationConfig;
+};
+
+export type AnimatedBackgroundConfig = {
+  spriteSheetPath: string;
+  anim: GameAnimationConfig;
+  spriteSheetFrameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig;
+};
+
+export type ScreenShakeConfig = {
+  intensity: number;
+  duration: number;
+};
+
+export type HealthbarConfig = {
+  spriteSheetPath: string;
+  spriteSheetFrameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig;
+  idleAnim: GameAnimationConfig;
+  removeAnim: GameAnimationConfig;
+};
+
+export type ComboLevelConfig = {
+  comboLevelDisplayName: string;
+  comboDuration: number;
+  damage: number;
+  barColor: number;
+  // comboBarUIAnimation : GameAnimationConfig;
 };
 
 export type GameAnimationConfig = {
