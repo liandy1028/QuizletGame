@@ -148,7 +148,6 @@ export default class DefinitionCard extends Phaser.GameObjects.Container {
     let placeholderimg =
       this.getByName<Phaser.GameObjects.Sprite>('placeholder-image');
     placeholderimg?.setVisible(!placeholderimg.visible);
-    return this;
     let img = this.getByName<Phaser.GameObjects.Sprite>('image');
     img?.setVisible(!img.visible);
     return this;

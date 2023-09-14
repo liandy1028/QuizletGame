@@ -34,7 +34,7 @@ export default class ComboManager {
 
   comboUp() {
     let maxComboLevel = ComboConfigs.ComboSetConfig.length;
-    if (this.currentComboIndex < maxComboLevel) {
+    if (this.currentComboIndex < maxComboLevel - 1) {
       this.currentComboIndex++;
     }
     this.currentComboTimer =
