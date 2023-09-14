@@ -10,7 +10,24 @@ export type GameStudiableItem = {
 };
 
 export type EnemyConfig = {
-  health: number;
+  maxHealth: number;
   speed: number;
-  spriteImage: string;
+  damageStunnedDuration: number;
+  // Spritesheet (reuse filepath as key)
+  spriteSheetPath: string;
+  spriteSheetFrameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig;
+
+  // anims
+  moveAnim: GameAnimationConfig;
+  stunnedAnim: GameAnimationConfig;
+  deathAnim: GameAnimationConfig;
+};
+
+export type GameAnimationConfig = {
+  key: string;
+  frameNumbers: number[];
+  // null by default property for easy anim creation in preload
+  frames?: Phaser.Types.Animations.AnimationFrame[];
+  frameRate: number;
+  repeat: number;
 };

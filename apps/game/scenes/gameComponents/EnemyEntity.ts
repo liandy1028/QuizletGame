@@ -1,7 +1,19 @@
 import { Scene } from 'phaser';
 import { EnemyConfig, GameStudiableItem } from '../types';
 import PlayerEntity from './PlayerEntity';
-import { GameEvents, PhysicsConstants, SortingLayers } from '../constants';
+import {
+  Assets,
+  GameEvents,
+  PhysicsConstants,
+  SortingLayers,
+} from '../constants';
+import HealthBar from './HealthBar';
+
+export const EnemyStates = {
+  Moving: 'Moving',
+  Stunned: 'Stunned',
+  Dead: 'Dead',
+};
 
 export default class EnemyEntity extends Phaser.GameObjects.Container {
   constructor(enemyConfig: EnemyConfig, scene: Scene, player: PlayerEntity) {
@@ -10,24 +22,22 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
     this.enemyConfig = enemyConfig;
     this.player = player;
 
-    this.currentHealth = enemyConfig.health;
+    this.markedForDeath = false;
+    this.currentHealth = enemyConfig.maxHealth;
 
     this.sprite = scene.add
-      .sprite(0, 0, enemyConfig.spriteImage)
+      .sprite(0, 0, '')
       .setName('sprite')
-      .setDepth(SortingLayers.ENEMY_SPRITE)
-      .setScale(3);
+      .setScale(Assets.SPRITE_SCALE);
 
-    this.termText = scene.add
-      .text(0, 0, '', this.textStyle)
-      .setName('text')
-      .setOrigin(0.5, 1);
+    this.healthBar = new HealthBar(scene, this);
 
-    this.add([this.sprite, this.termText]);
+    this.add([this.sprite, this.healthBar]);
     this.setSize(120, 120);
     this.setX(scene.cameras.main.width);
     this.setY(300);
     this.setName('enemyEntity');
+    this.setDepth(SortingLayers.ENEMY_SPRITE);
 
     // Setup physics
     this.physicsGroup = scene.physics.add.group(this, {
@@ -43,6 +53,8 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
     );
 
     this.scene.add.existing(this);
+
+    this.switchState(EnemyStates.Moving);
   }
 
   textStyle: Phaser.Types.GameObjects.Text.TextStyle = {
@@ -58,16 +70,36 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
 
   // state
   currentHealth: number;
+  currentState: string;
+  damageTintTimer: number;
+  deathAnimTimer: number;
+  markedForDeath: boolean;
 
   // Components
   sprite: Phaser.GameObjects.Sprite;
-  termText: Phaser.GameObjects.Text;
+  healthBar: HealthBar;
 
   private onHitPlayer() {
     this.scene.events.emit(GameEvents.ENEMY_TOUCHED_PLAYER, this.player, this);
   }
 
   update(deltaTime: number) {
+    switch (this.currentState) {
+      case EnemyStates.Dead:
+        this.handleDeadUpdate(deltaTime);
+        break;
+      case EnemyStates.Moving:
+        this.handleMovingUpdate(deltaTime);
+        break;
+      case EnemyStates.Stunned:
+        this.handleStunnedUpdate(deltaTime);
+        break;
+    }
+  }
+
+  private handleDeadUpdate(deltaTime: number) {}
+
+  private handleMovingUpdate(deltaTime: number) {
     // Move towards the player
     let cx = this.x;
     let px = this.player.x;
@@ -79,25 +111,62 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
     this.x += moveDist * Math.sign(px - cx);
   }
 
-  public displayGameStudiableItem(studiableItem: GameStudiableItem) {
-    this.setDisplayText(studiableItem.word.text);
+  private handleStunnedUpdate(deltaTime: number) {
+    if (this.damageTintTimer > 0) {
+      this.damageTintTimer -= deltaTime;
+    } else {
+      this.switchState(EnemyStates.Moving);
+    }
   }
 
-  private setDisplayText(text: string) {
-    this.termText.text = text;
-
-    let fontSize = 35;
-    let heightBound = 150;
-    let widthBound = 145;
-
-    this.termText.setWordWrapWidth(widthBound).setFontSize(fontSize);
-
-    while (
-      this.termText.height > heightBound ||
-      this.termText.width > widthBound
-    ) {
-      fontSize = Math.floor(fontSize * 0.9);
-      this.termText.setFontSize(fontSize);
+  private switchState(newState: string) {
+    switch (this.currentState) {
+      case EnemyStates.Stunned:
+        this.sprite.clearTint();
+        break;
     }
+
+    switch (newState) {
+      case EnemyStates.Dead:
+        this.sprite.play(this.enemyConfig.deathAnim.key);
+        this.markedForDeath = true;
+        this.sprite.on(
+          Phaser.Animations.Events.ANIMATION_COMPLETE,
+          function () {
+            console.log('DESTROY');
+            this.emit(GameEvents.ENEMY_DIED, this);
+            this.destroy();
+          }
+        );
+        break;
+      case EnemyStates.Moving:
+        this.sprite.play(this.enemyConfig.moveAnim.key);
+        break;
+      case EnemyStates.Stunned:
+        this.sprite.play(this.enemyConfig.stunnedAnim.key);
+        this.sprite.setTint(0xff0000);
+        break;
+    }
+    this.currentState = newState;
+  }
+
+  takeDamage(damage: number) {
+    if (this.currentState == EnemyStates.Dead) return;
+
+    let prevHealth = this.currentHealth;
+    this.currentHealth = Math.max(0, this.currentHealth - damage);
+
+    this.emit(GameEvents.ENEMY_TOOK_DAMAGE, prevHealth, this.currentHealth);
+
+    this.damageTintTimer = this.enemyConfig.damageStunnedDuration;
+    if (this.currentHealth <= 0) {
+      this.handleDeath();
+    } else {
+      this.switchState(EnemyStates.Stunned);
+    }
+  }
+
+  private handleDeath() {
+    this.switchState(EnemyStates.Dead);
   }
 }

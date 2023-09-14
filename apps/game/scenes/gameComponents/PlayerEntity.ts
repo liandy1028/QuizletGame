@@ -13,14 +13,14 @@ export default class PlayerEntity extends Phaser.GameObjects.Container {
     this.sprite = scene.add
       .sprite(0, 0, Assets.Images.PLAYER)
       .setName('sprite')
-      .setDepth(SortingLayers.PLAYER_SPRITE)
-      .setScale(3);
+      .setScale(Assets.SPRITE_SCALE);
 
     this.add([this.sprite]);
     this.setSize(50, 125);
     this.setX(100);
     this.setY(300);
     this.setName('playerEntity');
+    this.setDepth(SortingLayers.PLAYER_SPRITE);
 
     this.physicsGroup = scene.physics.add.staticGroup(this, {
       key: PhysicsConstants.PLAYER_STATIC_GROUP,

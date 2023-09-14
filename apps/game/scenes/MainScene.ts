@@ -18,6 +18,7 @@ import {
   HandManager,
   QuizletSetBank,
 } from './systems';
+import TargetIndicatorEntity from './gameComponents/TargetIndicatorEntity';
 
 type GameObject = Phaser.GameObjects.GameObject;
 
@@ -32,16 +33,18 @@ export class MainScene extends Scene {
   score: number;
   isGameOver: boolean;
 
-  // Dependencies
+  // Components
   enemyManager: EnemyManager;
   handManager: HandManager;
   player: PlayerEntity;
   gameDirector: GameDirector;
+  targetIndicator: TargetIndicatorEntity;
 
   create() {
     this.initializeSystems();
     this.createBackground();
     this.setupEvents();
+    this.isGameOver = false;
 
     // Additively loads UI scene
     this.scene.launch(Scenes.MAIN_UI_SCENE);
@@ -52,6 +55,7 @@ export class MainScene extends Scene {
     this.enemyManager.update(deltaTime);
     this.gameDirector.update(deltaTime);
     this.handManager.update(deltaTime);
+    this.targetIndicator.update(deltaTime);
   }
 
   private createBackground() {
@@ -64,16 +68,23 @@ export class MainScene extends Scene {
     );
 
     this.player = new PlayerEntity(this);
+
     this.enemyManager = new EnemyManager(this, this.player);
+
+    this.targetIndicator = new TargetIndicatorEntity(this);
+
+    this.handManager = new HandManager(5, this)
+      .setPosition(this.cameras.main.width / 2, 600)
+      .setSize(this.cameras.main.width * 0.6, 50)
+      .setDepth(SortingLayers.HAND);
+
     this.gameDirector = new GameDirector(
       quizletSetBank,
       this.enemyManager,
+      this.targetIndicator,
+      this.handManager,
       this
     );
-
-    this.handManager = new HandManager(5, this)
-      .setPosition(200, 600)
-      .setSize(600, 50);
   }
 
   private setupEvents() {

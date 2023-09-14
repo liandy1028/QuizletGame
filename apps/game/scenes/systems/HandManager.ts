@@ -16,13 +16,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
     this.initialize();
   }
 
-  destroy() {
-    for (let definitionCard of this.cards) {
-      definitionCard.destroy();
-    }
-  }
-
-  initialize() {
+  private initialize() {
     this.cards = [];
     this.heldCards = [];
     while (this.cards.length < 2 * this.size) {
@@ -37,15 +31,26 @@ export default class HandManager extends Phaser.GameObjects.Container {
     }
   }
 
+  a: Phaser.Types.Animations.Animation;
   quizletSetBank: QuizletSetBank;
   scene: Scene;
   size: number;
   cards: DefinitionCard[];
   heldCards: DefinitionCard[];
 
-  requesting = false;
-  requestCooldown = 1000;
-  requestCard() {
+  allowSelection = true;
+  public setAllowSelection(state: boolean) {
+    this.allowSelection = state;
+    if (state == true) {
+      this.setAlpha(1);
+    } else {
+      this.setAlpha(0.6);
+    }
+  }
+
+  private requesting = false;
+  private requestCooldown = 400;
+  private requestCard() {
     if (this.requesting) return;
     this.requesting = true;
     this.scene.time.delayedCall(this.requestCooldown, () => {
@@ -62,7 +67,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
       .setPosition(2 * this.width, 0)
       .setInteractive()
       .on(
-        'pointerover',
+        Phaser.Input.Events.POINTER_OVER,
         () => {
           if (this.focused !== card) {
             this.focused?.setDepth(0);
@@ -74,11 +79,9 @@ export default class HandManager extends Phaser.GameObjects.Container {
         this
       )
       .on(
-        'pointerdown',
+        Phaser.Input.Events.GAMEOBJECT_POINTER_DOWN,
         () => {
           if (this.focused === card) {
-            this.focused = null;
-            card.setDepth(0);
             this.removeCard(card);
             this.updateCardPositions();
           } else {
@@ -93,45 +96,57 @@ export default class HandManager extends Phaser.GameObjects.Container {
     this.updateCardPositions();
   }
 
-  moveSpeed = 100;
-  updateCardPositions() {
+  private moveSpeed = 200;
+  private maxRot = 20;
+  private updateCardPositions() {
+    let handWidth = Math.min(
+      this.cards[0].width * this.length * 0.8,
+      this.width
+    );
     let cardSpacing =
-      this.width / (this.heldCards.length + (this.focused ? 1 : 0));
-    let x = cardSpacing / 2;
+      handWidth / (this.heldCards.length + (this.focused ? 2 : 0));
+    let x = -handWidth / 2 + cardSpacing / 2;
     for (let card of this.heldCards) {
-      let y = 0;
-      if (this.focused === card) {
-        y = -this.height;
-        x += cardSpacing / 2;
-      }
-      this.scene.tweens.add({
+      let config: Phaser.Types.Tweens.TweenBuilderConfig = {
         targets: card,
         x: x,
-        y: y,
+        y: 0,
+        scale: 1,
+        angle: ((2 * x) / this.width) * this.maxRot,
         duration: this.moveSpeed,
-        ease: 'quart.out',
-      });
+        ease: Phaser.Math.Easing.Quartic.Out,
+      };
+      if (this.focused === card) {
+        x += cardSpacing;
+        config.x = x;
+        config.y = -this.height;
+        config.scale = 1.1;
+        config.angle = 0;
+      }
+      this.scene.tweens.add(config);
 
       x += cardSpacing;
       if (this.focused === card) {
-        x += cardSpacing / 2;
+        x += cardSpacing * 1.2;
       }
       this.bringToTop(card);
     }
     if (this.focused !== null) this.bringToTop(this.focused);
   }
 
-  focused: DefinitionCard;
-  update(deltaTime: number) {
+  private focused: DefinitionCard;
+  public update(deltaTime: number) {
     if (this.length < this.size) {
-      this.requestCard();
+      const newLocal = this;
+      newLocal.requestCard();
     }
   }
 
-  removeCard(card: DefinitionCard) {
-    console.log(card);
+  private removeCard(card: DefinitionCard) {
+    if (!this.allowSelection) return;
 
-    this.remove(card);
+    this.focused = null;
+    card.setDepth(0);
     let index = this.heldCards.indexOf(card);
     if (index !== -1) {
       this.heldCards.splice(index, 1);
@@ -139,12 +154,56 @@ export default class HandManager extends Phaser.GameObjects.Container {
 
     this.cards.push(card);
 
-    card.setActive(false).setVisible(false);
+    this.emit(GameEvents.CARD_CLICKED, card.studiableItem);
 
-    this.emit(GameEvents.CARD_CLICKED, card);
+    this.flip({
+      targets: card,
+      onComplete: () => {
+        this.remove(card);
+        card.setActive(false).setVisible(false);
+      },
+    });
   }
 
-  getRandomListOfCards(size: number) {
+  private flip(configs: Phaser.Types.Tweens.TweenBuilderConfig) {
+    let card: DefinitionCard = configs.targets;
+
+    configs.tweens = [
+      {
+        scaleX: 0,
+        x: 0,
+        y: -400,
+        angle: 45,
+        duration: 200,
+        ease: Phaser.Math.Easing.Sine,
+        onComplete: () => {
+          card.flip();
+        },
+      },
+      {
+        scaleX: 1,
+        angle: 90,
+        duration: 120,
+      },
+      {
+        scale: 1.3,
+        duration: 100,
+        ease: Phaser.Math.Easing.Expo.Out,
+      },
+      {
+        scale: 0.8,
+        duration: 500,
+        ease: Phaser.Math.Easing.Bounce.Out,
+        onComplete: () => {
+          card.flip();
+        },
+      },
+    ];
+
+    this.scene.tweens.chain(configs);
+  }
+
+  public getRandomListOfCards(size: number) {
     let currentHand = new Array<GameStudiableItem>();
     for (let card of this.heldCards) {
       currentHand.push(card.studiableItem);

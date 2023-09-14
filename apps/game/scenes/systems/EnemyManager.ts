@@ -6,6 +6,7 @@ import { EnemyConfig } from '../types';
 
 import QuizletSetBank from './QuizletSetBank';
 import GameDirector from './GameDirector';
+import { EnemyConfigs } from '../configs';
 
 export default class EnemyManager {
   constructor(scene: Scene, player: PlayerEntity) {
@@ -29,19 +30,12 @@ export default class EnemyManager {
   spawnTimer: number;
   currentEnemies: EnemyEntity[];
 
-  // enemy Configs
-  basicEnemy: EnemyConfig = {
-    health: 5,
-    speed: 170,
-    spriteImage: Assets.Images.DUMMY_ENEMY,
-  };
-
   update(deltaTime: number) {
     this.spawnTimer -= deltaTime;
 
     // Spawn
     if (this.spawnTimer <= 0) {
-      this.spawnEnemy(this.basicEnemy);
+      this.spawnEnemy(EnemyConfigs.AllEnemyConfigs[0]);
       this.spawnTimer = this.spawnCooldown;
     }
 
@@ -54,6 +48,7 @@ export default class EnemyManager {
   private spawnEnemy(config: EnemyConfig): EnemyEntity {
     let enemy = new EnemyEntity(config, this.scene, this.player);
     this.currentEnemies.push(enemy);
+    enemy.addListener(GameEvents.ENEMY_DIED, this.onEnemyDied, this);
     return enemy;
   }
 
@@ -61,12 +56,18 @@ export default class EnemyManager {
     let nearestX = Number.MAX_SAFE_INTEGER;
     let closestEnemy: EnemyEntity = null;
     for (let enemy of this.currentEnemies) {
-      if (enemy.x < nearestX) {
+      if (enemy.x < nearestX && !enemy.markedForDeath) {
         nearestX = enemy.x;
         closestEnemy = enemy;
       }
     }
 
     return closestEnemy;
+  }
+
+  private onEnemyDied(enemy: EnemyEntity) {
+    // Delete enemy from update list
+    let index = this.currentEnemies.findIndex(x => x == enemy);
+    this.currentEnemies.splice(index, 1);
   }
 }

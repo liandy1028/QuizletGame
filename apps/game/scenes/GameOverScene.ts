@@ -13,29 +13,29 @@ export class GameOverScene extends Scene {
 
   textStyle: Phaser.Types.GameObjects.Text.TextStyle = {
     color: '#FFFFFF',
-    fontSize: 300,
+    fontSize: 150,
   };
 
   create() {
-    console.log('HERE');
+    let width = this.cameras.main.width;
+    let height = this.cameras.main.height;
+
     this.scoreTextGameObject = this.add
-      .text(
-        this.cameras.main.width / 2,
-        this.cameras.main.height / 2,
-        'Game Over',
-        this.textStyle
-      )
-      .setAlign('center')
+      .text(width / 2, height / 2, 'Game Over', this.textStyle)
+      .setOrigin(0.5, 0.5)
+      .setAlign('left')
       .setInteractive();
 
     let bg = new AnimatedBackground(this, Assets.Anims.GAME_OVER_BACKGROUND);
 
-    // this.scoreTextGameObject.on('pointerup', this.handleContinue, this);
+    this.scoreTextGameObject.on(
+      Phaser.Input.Events.GAMEOBJECT_POINTER_UP,
+      this.handleContinue,
+      this
+    );
   }
 
   handleContinue() {
     this.scene.start(Scenes.MAIN_SCENE);
   }
-
-  update() {}
 }

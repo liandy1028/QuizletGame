@@ -4,72 +4,72 @@ import { Dataset, StudiableItem } from 'dataset/types';
 
 import QuizletSetBank from './QuizletSetBank';
 import EnemyManager from './EnemyManager';
+import TargetIndicatorEntity from '../gameComponents/TargetIndicatorEntity';
+import HandManager from './HandManager';
+import { EnemyEntity } from '../gameComponents';
+import { GameStudiableItem } from '../types';
 
 export default class GameDirector {
   constructor(
     quizletSetBank: QuizletSetBank,
     enemyManager: EnemyManager,
+    targetIndicator: TargetIndicatorEntity,
+    handManager: HandManager,
     scene: Scene
   ) {
     this.quizletSetBank = quizletSetBank;
-    this.scene = scene;
     this.enemyManager = enemyManager;
+    this.targetIndicator = targetIndicator;
+    this.handManager = handManager;
 
-    // this.currentChargingAttacks = [];
+    this.scene = scene;
+
+    this.handManager.addListener(
+      GameEvents.CARD_CLICKED,
+      this.cardClickedHandler,
+      this
+    );
+
+    this.setupNewAttack();
   }
 
   // Dependencies
   scene: Scene;
   quizletSetBank: QuizletSetBank;
   enemyManager: EnemyManager;
+  targetIndicator: TargetIndicatorEntity;
+  handManager: HandManager;
 
   // State
-  // currentChargingAttacks: EnemyChargingAttack[];
+  currentTarget: EnemyEntity;
 
   update(deltaTime: number) {
-    // Update charging attacks
-    /* for (var i = this.currentChargingAttacks.length - 1; i >= 0; i--) {
-      let chargingAttack = this.currentChargingAttacks[i];
-      chargingAttack.update(deltaTime);
+    if (this.currentTarget == null || this.currentTarget.markedForDeath) {
+      this.setupNewAttack();
+    }
 
-      // If launched then remove from active charging attacks
-      if (chargingAttack.isLaunched) {
-        this.currentChargingAttacks.splice(i, 1);
-      }
-    } */
-    // Update positions of charging attacks
-    /* for (var i = 0; i < this.currentChargingAttacks.length; i++) {
-      let chargingAttack = this.currentChargingAttacks[i];
-
-      let currentPosition = new Phaser.Math.Vector2(
-        chargingAttack.attackContainer.x,
-        chargingAttack.attackContainer.y
-      );
-      let targetPosition = new Phaser.Math.Vector2(100 + i * 240, 125);
-
-      let tOS = 0.95;
-      currentPosition.lerp(
-        targetPosition,
-        1 - Math.pow(1 - tOS, deltaTime / 1000)
-      );
-
-      chargingAttack.attackContainer.setPosition(
-        currentPosition.x,
-        currentPosition.y
-      );
-    } */
+    this.targetIndicator.currentTarget = this.currentTarget;
   }
 
-  /* createEnemyChargingAttack(
-    gameStudiableItem: GameStudiableItem,
-    chargeupDuration: number
-  ): EnemyChargingAttack {
-    let chargingAttack = new EnemyChargingAttack(
-      gameStudiableItem,
-      chargeupDuration,
-      this.scene
+  private setupNewAttack() {
+    let closestEnemy = this.enemyManager.getClosestEnemy();
+    if (closestEnemy == null) return;
+
+    this.currentTarget = closestEnemy;
+    this.targetIndicator.displayGameStudiableItem(
+      this.handManager.getRandomListOfCards(1)[0]
     );
-    this.currentChargingAttacks.push(chargingAttack);
-    return chargingAttack;
-  } */
+  }
+
+  private cardClickedHandler(studiableItem: GameStudiableItem) {
+    if (studiableItem.word.text == this.targetIndicator.termText.text) {
+      this.currentTarget.takeDamage(1);
+      this.setupNewAttack();
+    } else {
+      this.handManager.setAllowSelection(false);
+      this.scene.time.delayedCall(1000, () => {
+        this?.handManager?.setAllowSelection(true);
+      });
+    }
+  }
 }
