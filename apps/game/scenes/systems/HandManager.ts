@@ -19,7 +19,8 @@ export default class HandManager extends Phaser.GameObjects.Container {
   private initialize() {
     this.cards = [];
     this.heldCards = [];
-    while (this.cards.length < 2 * this.size) {
+    this.nextCards = [];
+    while (this.cards.length < 2 * this.size + 1) {
       // let definitionCards = this.quizletSetBank.getRandomizedStudiableItems();
       // for (const definitionCard of definitionCards) {
       //   this.cards.push(
@@ -29,15 +30,24 @@ export default class HandManager extends Phaser.GameObjects.Container {
       //   );
       // }
       this.cards = this.quizletSetBank.getRandomizedStudiableItems();
+      for (let i = 0; i < this.size; ++i) {
+        this.nextCards.push(
+          new DefinitionCard(this.cards[i], this.scene)
+            .setActive(false)
+            .setVisible(false)
+        );
+      }
     }
   }
 
-  a: Phaser.Types.Animations.Animation;
   quizletSetBank: QuizletSetBank;
   scene: Scene;
   size: number;
   cards: GameStudiableItem[];
   heldCards: DefinitionCard[];
+
+  // Preload some cards
+  nextCards: DefinitionCard[];
 
   allowSelection = true;
   public setAllowSelection(state: boolean) {
@@ -59,7 +69,15 @@ export default class HandManager extends Phaser.GameObjects.Container {
     });
 
     // let card = this.cards.shift();
-    let card = new DefinitionCard(this.cards.shift(), this.scene);
+    // let card = new DefinitionCard(this.cards.shift(), this.scene);
+
+    this.nextCards.push(
+      new DefinitionCard(this.cards[this.size], this.scene)
+        .setActive(false)
+        .setVisible(false)
+    );
+    this.cards.shift();
+    let card = this.nextCards.shift();
     this.add(card);
     this.heldCards.push(card);
 

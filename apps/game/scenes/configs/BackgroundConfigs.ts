@@ -2,7 +2,7 @@ import { AnimatedBackgroundConfig } from '../types';
 
 export const MAIN_BACKGROUND_CONFIG: AnimatedBackgroundConfig = {
   // Animations
-  spriteSheetPath: 'mainBackground.png',
+  spriteSheetPath: 'backgrounds/mainBackground.png',
   spriteSheetFrameConfig: {
     frameWidth: 320,
     frameHeight: 180,
@@ -17,7 +17,7 @@ export const MAIN_BACKGROUND_CONFIG: AnimatedBackgroundConfig = {
 
 export const GAME_OVER_BACKGROUND_CONFIG: AnimatedBackgroundConfig = {
   // Animations
-  spriteSheetPath: 'gameoverbackground.png',
+  spriteSheetPath: 'backgrounds/gameoverbackground.png',
   spriteSheetFrameConfig: {
     frameWidth: 320,
     frameHeight: 180,
@@ -30,7 +30,23 @@ export const GAME_OVER_BACKGROUND_CONFIG: AnimatedBackgroundConfig = {
   },
 };
 
+export const LOADING_BACKGROUND_CONFIG: AnimatedBackgroundConfig = {
+  // Animations
+  spriteSheetPath: 'backgrounds/loadingBackground.png',
+  spriteSheetFrameConfig: {
+    frameWidth: 320,
+    frameHeight: 180,
+  },
+  anim: {
+    key: 'loading-bg',
+    frameNumbers: [0, 1, 2, 3],
+    frameRate: 8,
+    repeat: -1,
+  },
+};
+
 export const AllBackgroundConfigs: AnimatedBackgroundConfig[] = [
   MAIN_BACKGROUND_CONFIG,
   GAME_OVER_BACKGROUND_CONFIG,
+  LOADING_BACKGROUND_CONFIG,
 ];

@@ -36,7 +36,7 @@ export class MainScene extends Scene {
   // Components
   enemyManager: EnemyManager;
   handManager: HandManager;
-  comboManager : ComboManager;
+  comboManager: ComboManager;
   player: PlayerEntity;
   gameDirector: GameDirector;
   targetIndicator: TargetIndicatorEntity;
@@ -61,7 +61,10 @@ export class MainScene extends Scene {
   }
 
   private createBackground() {
-    let bg = new AnimatedBackground(this, BackgroundConfigs.MAIN_BACKGROUND_CONFIG);
+    let bg = new AnimatedBackground(
+      this,
+      BackgroundConfigs.MAIN_BACKGROUND_CONFIG
+    );
   }
 
   private initializeSystems() {

@@ -1,10 +1,17 @@
 import { Scene } from 'phaser';
 import { Assets, Scenes, Registry } from './constants';
+import { Dataset } from 'dataset/types';
 import { QuizletSetBank } from './systems';
 
 import Quizlet from 'dataset';
-import { AnimConfigs, BackgroundConfigs, EnemyConfigs } from './configs';
+import {
+  AnimConfigs,
+  BackgroundConfigs,
+  EnemyConfigs,
+  SpellConfig,
+} from './configs';
 import { GameAnimationConfig } from './types';
+import { AnimatedBackground } from './gameComponents';
 
 export class PreloaderScene extends Scene {
   constructor() {
@@ -16,19 +23,21 @@ export class PreloaderScene extends Scene {
     this.load.on('progress', this.onProgress, this);
     this.load.on('fileprogress', this.onFileProgress, this);
 
-    // let ghibli = 'Studio Ghibli Movie Trivia';
-    // let disney = 'Disney Princess Trivia';
-    // // Load quizlet
-    // const quizletSets = Quizlet.getAllSets();
-    // for (let dataset of quizletSets) {
-    //   if (dataset.set.title == disney) var usedDataset = dataset;
-    // }
-
-    // TODO: DELETE
+    // Load quizlet
     const quizletSets = Quizlet.getAllSets();
-    let usedDataset = quizletSets[0];
-    for (let set of quizletSets.slice(1)) {
-      usedDataset.studiableItem.push(...set.studiableItem);
+    let setName: string = this.registry.get(Registry.QUIZLET_SET_NAME);
+    let usedDataset: Dataset = {
+      set: quizletSets[0].set, // placeholder
+      studiableItem: [],
+    };
+    if (setName == Registry.QUIZLET_SET_ALL) {
+      for (let set of quizletSets) {
+        usedDataset.studiableItem.push(...set.studiableItem);
+      }
+    } else {
+      for (let dataset of quizletSets) {
+        if (dataset.set.title == setName) usedDataset = dataset;
+      }
     }
 
     this.registry.set(Registry.USED_QUIZLET_DATASET, usedDataset);
@@ -36,7 +45,6 @@ export class PreloaderScene extends Scene {
       Registry.QUIZLET_SET_BANK,
       new QuizletSetBank(usedDataset, this.load)
     );
-    console.log(usedDataset.studiableItem.length);
 
     // Load game assets
     this.load.setPath('game/assets');
@@ -61,6 +69,15 @@ export class PreloaderScene extends Scene {
         bgConfig.spriteSheetPath,
         bgConfig.spriteSheetPath,
         bgConfig.spriteSheetFrameConfig
+      );
+    }
+
+    // Load spell spritesheets
+    for (let spellConfig of SpellConfig.AllSpells) {
+      this.load.spritesheet(
+        spellConfig.spriteSheetPath,
+        spellConfig.spriteSheetPath,
+        spellConfig.spriteSheetFrameConfig
       );
     }
 
@@ -114,9 +131,23 @@ export class PreloaderScene extends Scene {
       );
     }
 
+    // Load background animations
     for (let bgConfig of BackgroundConfigs.AllBackgroundConfigs) {
       this.createAnimFromConfig(bgConfig.spriteSheetPath, bgConfig.anim);
     }
+
+    // Load spell projectile animations
+    for (let spellConfig of SpellConfig.AllSpells) {
+      this.createAnimFromConfig(
+        spellConfig.spriteSheetPath,
+        spellConfig.spellAnimation
+      );
+    }
+
+    let loadingBG = new AnimatedBackground(
+      this,
+      BackgroundConfigs.LOADING_BACKGROUND_CONFIG
+    );
 
     this.scene.start(Scenes.MAIN_SCENE);
   }

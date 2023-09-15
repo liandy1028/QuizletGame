@@ -6,9 +6,9 @@ import QuizletSetBank from './QuizletSetBank';
 import EnemyManager from './EnemyManager';
 import TargetIndicatorEntity from '../gameComponents/TargetIndicatorEntity';
 import HandManager from './HandManager';
-import { EnemyEntity } from '../gameComponents';
+import { AttackSpell, EnemyEntity } from '../gameComponents';
 import { GameStudiableItem } from '../types';
-import { EffectConfigs } from '../configs';
+import { EffectConfigs, PlayerConfig } from '../configs';
 import ComboManager from './ComboManager';
 
 export default class GameDirector {
@@ -68,8 +68,17 @@ export default class GameDirector {
 
   private cardClickedHandler(studiableItem: GameStudiableItem) {
     if (studiableItem.word.text == this.targetIndicator.termText.text) {
-      this.currentTarget.takeDamage(this.comboManager.getCurrentComboDamage());
+      let damage = this.comboManager.getCurrentComboDamage();
+      this.currentTarget.tryMarkForDeath(damage);
       this.comboManager.comboUp();
+
+      /* let spell = new AttackSpell(
+        PlayerConfig.Config.xPos,
+        PlayerConfig.Config.yPos,
+        this.currentTarget,
+        damage,
+        this.scene
+      ); */
 
       this.setupNewAttack();
     } else {

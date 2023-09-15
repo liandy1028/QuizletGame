@@ -5,6 +5,7 @@ import {
   PhysicsConstants,
   SortingLayers,
 } from '../constants';
+import { PlayerConfig } from '../configs';
 
 export default class PlayerEntity extends Phaser.GameObjects.Container {
   constructor(scene: Scene) {
@@ -17,8 +18,8 @@ export default class PlayerEntity extends Phaser.GameObjects.Container {
 
     this.add([this.sprite]);
     this.setSize(50, 125);
-    this.setX(100);
-    this.setY(200);
+    this.setX(PlayerConfig.Config.xPos);
+    this.setY(PlayerConfig.Config.yPos);
     this.setName('playerEntity');
     this.setDepth(SortingLayers.PLAYER_SPRITE);
 

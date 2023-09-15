@@ -120,7 +120,6 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
   }
 
   private switchState(newState: string) {
-
     switch (newState) {
       case EnemyStates.Dead:
         this.sprite.play(this.enemyConfig.deathAnim.key);
@@ -154,6 +153,12 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
       this.switchState(EnemyStates.Dead);
     } else {
       this.switchState(EnemyStates.Stunned);
+    }
+  }
+
+  tryMarkForDeath(damage: number) {
+    if (this.currentHealth <= damage) {
+      this.markedForDeath = true;
     }
   }
 

@@ -3,4 +3,15 @@ import * as BackgroundConfigs from './BackgroundConfigs';
 import * as EffectConfigs from './EffectConfigs';
 import * as AnimConfigs from './AnimConfigs';
 import * as ComboConfigs from './ComboConfigs';
-export { EnemyConfigs, BackgroundConfigs, EffectConfigs, AnimConfigs, ComboConfigs };
+import * as PlayerConfig from './PlayerConfig';
+import * as SpellConfig from './SpellConfig';
+
+export {
+  EnemyConfigs,
+  BackgroundConfigs,
+  EffectConfigs,
+  AnimConfigs,
+  ComboConfigs,
+  PlayerConfig,
+  SpellConfig,
+};

@@ -1,47 +1,114 @@
 import { Scene } from 'phaser';
-import { Assets, GameEvents } from '../constants';
-import { GameStudiableItem } from '../types';
+import { Assets, GameEvents, SortingLayers } from '../constants';
+import { GameStudiableItem, SpellConfig } from '../types';
+import EnemyEntity from './EnemyEntity';
 
-// Attacks have the definition, player matches the term to negate it
-export default class ChargingAttack {
-  constructor(item: GameStudiableItem, chargeupDuration: number, scene: Scene) {
-    const x = Phaser.Math.Between(0, 800);
-    const y = Phaser.Math.Between(0, 600);
+export default class AttackSpell extends Phaser.GameObjects.Container {
+  constructor(
+    x: number,
+    y: number,
+    targetEnemyEntity: EnemyEntity,
+    spellConfig: SpellConfig,
+    damage: number,
+    scene: Scene
+  ) {
+    super(scene);
+    this.targetEnemyEntity = targetEnemyEntity;
+    this.damage = damage;
+    this.spellConfig = spellConfig;
 
-    this.attackBackground = scene.add
-      .sprite(0, 0, Assets.Images.CARD)
-      .setName('background');
+    this.sprite = scene.add
+      .sprite(0, 0, '')
+      .setScale(Assets.SPRITE_SCALE)
+      .play(spellConfig.spellAnimation.key);
 
-    this.attackText = scene.add
-      .text(0, 0, item.definition.text, {
-        color: '#FFFFFF',
-      })
-      .setName('text');
+    this.trailParticles = [];
 
-    this.attackContainer = scene.add
-      .container(0, 0, [this.attackText, this.attackBackground])
-      .setName('container')
-      .setX(x)
-      .setY(y)
-      .setSize(50, 50);
+    /* for (let trailParticles of spellConfig.trailParticles) {
+      let newTrailParticle = scene.add.
+    } */
 
-    // this.chargeTimer = Phaser.Time.Clock
+    this.add([this.sprite]);
+    this.setSize(50, 50);
+    this.setPosition(x, y);
+    this.setDepth(SortingLayers.SPELL);
 
-    return this;
+    // Add projectile as dynamic physics body
+    scene.physics.add.existing(this, false);
+
+    this.pBody = this.body as Phaser.Physics.Arcade.Body;
+    this.pBody.setEnable(true);
+
+    scene.physics.add.overlap(
+      this,
+      targetEnemyEntity,
+      this.onHitEnemy,
+      null,
+      this
+    );
+
+    scene.add.existing(this);
   }
 
-  chargeTimer: number;
+  targetEnemyEntity: EnemyEntity;
 
-  update() {}
+  // Config
+  damage: number;
+  spellConfig: SpellConfig;
+
+  // Components
+  sprite: Phaser.GameObjects.Sprite;
+  pBody: Phaser.Physics.Arcade.Body;
+  trailParticles: Phaser.GameObjects.Particles.ParticleEmitter[];
+
+  preUpdate() {
+    let diffX = this.targetEnemyEntity.x - this.x;
+    let diffY = this.targetEnemyEntity.y - this.y;
+
+    let angle = Math.atan2(diffY, diffX);
+    this.setRotation(angle);
+
+    let vec2 = new Phaser.Math.Vector2(diffX, diffY).normalize().scale(1000);
+
+    this.pBody.setVelocity(vec2.x, vec2.y);
+  }
+
+  private onHitEnemy(self, targetEnemy) {
+    let enemy: EnemyEntity = targetEnemy as EnemyEntity;
+    enemy.takeDamage(this.damage);
+    // Particles
+    // Create particles for flame
+    let impactParticles = this.scene.add.particles(
+      this.x,
+      this.y,
+      Assets.Images.BASIC_PARTICLE,
+      {
+        color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
+        colorEase: 'quad.out',
+        lifespan: 500,
+        scale: { start: 0.7, end: 0, ease: 'sine.out' },
+        speed: 200,
+        advance: 500,
+        frequency: 50,
+        blendMode: 'ADD',
+        duration: 100,
+        angle: {
+          min: -45,
+          max: 45,
+        },
+      }
+    );
+    impactParticles.setAngle(this.angle);
+    impactParticles.setDepth(SortingLayers.SPELL);
+    // When particles are complete, destroy them
+    impactParticles.once('complete', () => {
+      impactParticles.destroy();
+    });
+
+    this.destroy();
+  }
 
   destroy() {
-    this.attackContainer.destroy();
+    super.destroy();
   }
-
-  studiableItem: GameStudiableItem;
-  attackBackground: Phaser.GameObjects.Sprite;
-  attackText: Phaser.GameObjects.Text;
-  attackContainer: Phaser.GameObjects.Container;
-
-  onLaunchAttackEvent = new Phaser.Events.EventEmitter();
 }

@@ -25,6 +25,11 @@ export type EnemyConfig = {
   deathAnim: GameAnimationConfig;
 };
 
+export type PlayerConfig = {
+  xPos: number;
+  yPos: number;
+};
+
 export type AnimatedBackgroundConfig = {
   spriteSheetPath: string;
   anim: GameAnimationConfig;
@@ -48,7 +53,37 @@ export type ComboLevelConfig = {
   comboDuration: number;
   damage: number;
   barColor: number;
+  spells: SpellConfig[];
   // comboBarUIAnimation : GameAnimationConfig;
+};
+
+export type SpellConfig = {
+  initialSpeed: number;
+  launchAngleRange: {
+    min: number;
+    max: number;
+  };
+  angularVelocity: number;
+  hitboxSize: {
+    width: number;
+    height: number;
+  };
+
+  spriteSheetPath: string;
+  spriteSheetFrameConfig: Phaser.Types.Loader.FileTypes.ImageFrameConfig;
+  spellAnimation: GameAnimationConfig;
+
+  impactParticles: ParticleConfig[];
+  trailParticles: ParticleConfig[];
+  castParticles: ParticleConfig[];
+
+  impactScreenShake?: ScreenShakeConfig;
+  castScreenShake?: ScreenShakeConfig;
+};
+
+export type ParticleConfig = {
+  emitterConfig: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig;
+  textureKey: string;
 };
 
 export type GameAnimationConfig = {

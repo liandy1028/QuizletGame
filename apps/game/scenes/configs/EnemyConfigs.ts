@@ -5,10 +5,10 @@ export const TEST_ENEMY: EnemyConfig = {
   maxHealth: 2,
   speed: 50,
   damageStunnedDuration: 1000,
-  pointReward : 10,
+  pointReward: 10,
 
   // Animations
-  spriteSheetPath: 'dummyEnemy.png',
+  spriteSheetPath: 'enemies/dummyEnemy.png',
   spriteSheetFrameConfig: {
     frameWidth: 48,
     frameHeight: 48,

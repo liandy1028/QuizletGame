@@ -26,7 +26,7 @@ export default class DefinitionCard extends Phaser.GameObjects.Container {
 
   private lazyLoadImage(imageID: string) {
     if (this.scene.textures.exists(imageID)) {
-      this.addImage();
+      if (this.scene) this.addImage();
     } else {
       this.addPlaceholderImage();
       this.scene.load.image(imageID, imageID);
@@ -42,7 +42,7 @@ export default class DefinitionCard extends Phaser.GameObjects.Container {
     let imgBounds = { width: this.width * 0.9, height: this.height * 0.45 };
     this.add(
       this.scene.add
-        .sprite(0, -this.height / 4, Assets.Images.STAR)
+        .sprite(0, -this.height / 4, Assets.Images.LOADING)
         .setName('placeholder-image')
     );
     let img = this.getByName<Phaser.GameObjects.Sprite>('placeholder-image');

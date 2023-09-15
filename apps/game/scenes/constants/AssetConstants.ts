@@ -1,8 +1,9 @@
 export const Images = {
-  CARD: 'definitionCard.png',
+  CARD: 'cards/definitionCard.png',
   TARGET_INDICATOR: 'targetIndicator.png',
-  STAR: 'star.png',
+  LOADING: 'cards/loadingImage.png',
   PLAYER: 'player.png',
+  BASIC_PARTICLE: 'spells/basicParticle.png',
 };
 
 export const SpriteSheets = {};

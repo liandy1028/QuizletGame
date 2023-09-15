@@ -1,7 +1,7 @@
 import { GameAnimationConfig, HealthbarConfig } from '../types';
 
 export const HEALTH_BAR_IDLE_ANIM: HealthbarConfig = {
-  spriteSheetPath: 'healthPoint.png',
+  spriteSheetPath: 'enemies/healthPoint.png',
   spriteSheetFrameConfig: {
     frameWidth: 24,
     frameHeight: 24,

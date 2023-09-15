@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import { Preloader, MainScene, MainUIScene, GameOverScene } from '../scenes';
+import { Registry } from '../scenes/constants';
 
-export default function GameComponent() {
+export default function GameComponent(props: { setName?: string }) {
   function initPhaser() {
     var config: Phaser.Types.Core.GameConfig = {
       type: Phaser.CANVAS,
       width: 1280,
       height: 720,
-      parent: 'phaser-game-content',
       canvas: document.getElementById('canvas') as HTMLCanvasElement,
       antialias: true,
       physics: {
@@ -20,23 +20,26 @@ export default function GameComponent() {
       },
       scene: [Preloader, MainScene, MainUIScene, GameOverScene],
     };
-    var game = new Phaser.Game(config);
+    let game = new Phaser.Game(config);
+    game.registry.set(
+      Registry.QUIZLET_SET_NAME,
+      props.setName ? props.setName : Registry.QUIZLET_SET_ALL
+    );
 
     return game;
   }
 
-  // Make sure the game is only initialized once
-  const phaserGameRef = useRef<Phaser.Game>(null);
+  // Make sure the game instance is cleaned up
   useEffect(
     () => {
-      if (phaserGameRef.current) {
-        return;
-      }
-
-      phaserGameRef.current = initPhaser();
+      let phaserGame = initPhaser();
+      // cleanup
+      return () => {
+        phaserGame.destroy(false);
+      };
     },
     [] /* only run once; config ref elided on purpose */
   );
 
-  return <canvas id="canvas" width="800" height="600"></canvas>;
+  return <canvas id="canvas" width="1280" height="720"></canvas>;
 }
