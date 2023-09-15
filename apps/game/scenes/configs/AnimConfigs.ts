@@ -14,7 +14,7 @@ export const HEALTH_BAR_IDLE_ANIM: HealthbarConfig = {
   },
   removeAnim: {
     key: 'health-bar-remove',
-    frameNumbers: [1, 2, 3, 4, 5,6,7,8,9],
+    frameNumbers: [1, 2, 3, 4, 5, 6, 7, 8],
     frameRate: 12,
     repeat: 0,
   },

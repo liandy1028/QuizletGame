@@ -74,7 +74,6 @@ export default class HandManager extends Phaser.GameObjects.Container {
           if (this.focused !== card) {
             this.focused?.setDepth(0);
             this.focused = card;
-            card.setDepth(1);
             this.updateCardPositions();
           }
         },
@@ -88,7 +87,6 @@ export default class HandManager extends Phaser.GameObjects.Container {
             this.updateCardPositions();
           } else {
             this.focused = card;
-            card.setDepth(1);
             this.updateCardPositions();
           }
         },
@@ -171,6 +169,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
   }
 
   private flip(configs: Phaser.Types.Tweens.TweenBuilderConfig) {
+    let stayDuration = this.allowSelection ? 0 : 1000;
     let card: DefinitionCard = configs.targets;
 
     configs.tweens = [
@@ -179,7 +178,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
         x: 0,
         y: -400,
         angle: 45,
-        duration: 200,
+        duration: 150,
         ease: Phaser.Math.Easing.Sine,
         onComplete: () => {
           card.flip();
@@ -188,16 +187,17 @@ export default class HandManager extends Phaser.GameObjects.Container {
       {
         scaleX: 1,
         angle: 90,
-        duration: 120,
+        duration: 90,
       },
       {
         scale: 1.3,
-        duration: 100,
+        duration: 75,
         ease: Phaser.Math.Easing.Expo.Out,
       },
       {
         scale: 0.8,
-        duration: 500,
+        duration: 375,
+        hold: stayDuration,
         ease: Phaser.Math.Easing.Bounce.Out,
         onComplete: () => {
           card.flip();

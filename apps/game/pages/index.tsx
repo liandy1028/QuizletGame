@@ -1,4 +1,3 @@
-import { group } from 'console';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';

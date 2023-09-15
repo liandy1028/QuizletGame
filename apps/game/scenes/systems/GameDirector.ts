@@ -81,7 +81,7 @@ export default class GameDirector {
       this.comboManager.comboDown();
 
       this.handManager.setAllowSelection(false);
-      this.scene.time.delayedCall(1000, () => {
+      this.scene.time.delayedCall(EffectConfigs.TIMEOUT_TIME, () => {
         this?.handManager?.setAllowSelection(true);
       });
     }
