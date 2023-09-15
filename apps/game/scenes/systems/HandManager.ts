@@ -90,7 +90,6 @@ export default class HandManager extends Phaser.GameObjects.Container {
         Phaser.Input.Events.POINTER_OVER,
         () => {
           if (this.focused !== card) {
-            this.focused?.setDepth(0);
             this.focused = card;
             this.updateCardPositions();
           }
@@ -119,7 +118,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
   private updateCardPositions() {
     if (this.heldCards.length == 0) return;
     let handWidth = Math.min(
-      this.heldCards[0].width * this.length * 0.8,
+      this.heldCards[0].width * this.heldCards.length * 0.8,
       this.width
     );
     let cardSpacing =
@@ -164,6 +163,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
   private removeCard(card: DefinitionCard) {
     if (!this.allowSelection) return;
 
+    card.disableInteractive();
     this.focused = null;
     card.setDepth(0);
     let index = this.heldCards.indexOf(card);

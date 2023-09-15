@@ -2,13 +2,14 @@ import { useEffect, useRef } from 'react';
 import Phaser from 'phaser';
 import { Preloader, MainScene, MainUIScene, GameOverScene } from '../scenes';
 import { Registry } from '../scenes/constants';
+import * as SizeConsts from './gameSize';
 
 export default function GameComponent(props: { setName?: string }) {
   function initPhaser() {
     var config: Phaser.Types.Core.GameConfig = {
       type: Phaser.CANVAS,
-      width: 1280,
-      height: 720,
+      width: SizeConsts.WIDTH,
+      height: SizeConsts.HEIGHT,
       canvas: document.getElementById('canvas') as HTMLCanvasElement,
       antialias: true,
       physics: {
@@ -21,6 +22,13 @@ export default function GameComponent(props: { setName?: string }) {
       scene: [Preloader, MainScene, MainUIScene, GameOverScene],
     };
     let game = new Phaser.Game(config);
+    // game.canvas.addEventListener(
+    //   Phaser.Input.Events.POINTER_WHEEL,
+    //   function (event) {
+    //     return false;
+    //   },
+    //   false
+    // );
     game.registry.set(
       Registry.QUIZLET_SET_NAME,
       props.setName ? props.setName : Registry.QUIZLET_SET_ALL
@@ -41,5 +49,11 @@ export default function GameComponent(props: { setName?: string }) {
     [] /* only run once; config ref elided on purpose */
   );
 
-  return <canvas id="canvas" width="1280" height="720"></canvas>;
+  return (
+    <canvas
+      id="canvas"
+      width={SizeConsts.WIDTH}
+      height={SizeConsts.HEIGHT}
+    ></canvas>
+  );
 }

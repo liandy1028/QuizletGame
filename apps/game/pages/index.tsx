@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import WordButton from '../components/WordButton';
 import { useState } from 'react';
+import Sidebar from '../components/Sidebar';
 
 // Dynamically load game component to prevent errors with importing phaser synchronously
 const GameComponent = dynamic(() => import('../components/GameComponent'), {
@@ -11,18 +12,29 @@ const GameComponent = dynamic(() => import('../components/GameComponent'), {
 
 // #region css
 
+const OuterBox = styled.div`
+  display: grid;
+  * {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  max-height: 100vh;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background-color: #11141f;
+`;
+
 const GameWindow = styled.div`
   width: 100%;
+  height: 100%;
+  overflow: hidden;
   display: flex;
   canvas {
     margin: auto;
-    width: 75%;
+    max-height: 100%;
+    max-width: 100%;
   }
-`;
-
-const Banner = styled.div`
-  text-align: center;
-  font-size: 50px;
 `;
 
 const LoadingDiv = styled.div`
@@ -39,35 +51,14 @@ export default function MainPage() {
 
   const handleWordButtonClick = word => {
     setSetName(word);
-    console.log(word);
   };
 
   return (
-    <>
-      <div>
-        <div>
-          <WordButton
-            text="Disney Princess Trivia"
-            onClick={() => handleWordButtonClick('Disney Princess Trivia')}
-          />
-          <WordButton
-            text="Studio Ghibli Movie Trivia"
-            onClick={() => handleWordButtonClick('Studio Ghibli Movie Trivia')}
-          />
-          <WordButton
-            text="Chinese food"
-            onClick={() => handleWordButtonClick('Chinese food')}
-          />
-          <WordButton
-            text="Video Games & Characters"
-            onClick={() => handleWordButtonClick('Video Games & Characters')}
-          />
-          {/* Add more WordButtons as needed */}
-        </div>
-      </div>
+    <OuterBox>
+      <Sidebar target={handleWordButtonClick} />
       <GameWindow>
         <GameComponent key={setName} setName={setName} />
       </GameWindow>
-    </>
+    </OuterBox>
   );
 }
