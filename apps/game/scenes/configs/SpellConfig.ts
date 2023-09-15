@@ -53,7 +53,6 @@ export const BasicSpell: SpellConfig = {
         advance: 500,
         frequency: 50,
         blendMode: 'ADD',
-        follow: this,
       },
     },
   ],
