@@ -69,16 +69,19 @@ export default class GameDirector {
   private cardClickedHandler(studiableItem: GameStudiableItem) {
     if (studiableItem.word.text == this.targetIndicator.termText.text) {
       let damage = this.comboManager.getCurrentComboDamage();
+      let spellConfig = this.comboManager.getRandomSpellConfig();
+
       this.currentTarget.tryMarkForDeath(damage);
       this.comboManager.comboUp();
 
-      /* let spell = new AttackSpell(
+      let spell = new AttackSpell(
         PlayerConfig.Config.xPos,
         PlayerConfig.Config.yPos,
         this.currentTarget,
+        spellConfig,
         damage,
         this.scene
-      ); */
+      );
 
       this.setupNewAttack();
     } else {

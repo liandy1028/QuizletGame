@@ -17,23 +17,57 @@ export default class AttackSpell extends Phaser.GameObjects.Container {
     this.damage = damage;
     this.spellConfig = spellConfig;
 
+    // Setup sprite
     this.sprite = scene.add
       .sprite(0, 0, '')
       .setScale(Assets.SPRITE_SCALE)
       .play(spellConfig.spellAnimation.key);
 
+    // Setup trail particles
     this.trailParticles = [];
+    for (let trailParticleConfig of spellConfig.trailParticles) {
+      // Make a shallow copy since we're setting the follow to the projectile
+      let emitConfig = { ...trailParticleConfig.emitterConfig };
+      emitConfig.follow = this;
+      let trailParticles = scene.add.particles(
+        0,
+        0,
+        trailParticleConfig.textureKey,
+        emitConfig
+      );
+      trailParticles.setDepth(SortingLayers.SPELL);
+      this.trailParticles.push(trailParticles);
+    }
 
-    /* for (let trailParticles of spellConfig.trailParticles) {
-      let newTrailParticle = scene.add.
-    } */
+    // Setup cast particles
+    for (let castParticleConfig of spellConfig.castParticles) {
+      let castParticles = this.scene.add.particles(
+        this.x,
+        this.y,
+        castParticleConfig.textureKey,
+        castParticleConfig.emitterConfig
+      );
+      castParticles.setDepth(SortingLayers.SPELL);
+      // When particles are complete, destroy them
+      castParticles.once('complete', () => {
+        castParticles.destroy();
+      });
+    }
+
+    // Cast screen shake
+    if (spellConfig.castScreenShake) {
+      this.scene.cameras.main.shake(
+        spellConfig.castScreenShake.duration,
+        spellConfig.castScreenShake.intensity
+      );
+    }
 
     this.add([this.sprite]);
-    this.setSize(50, 50);
+    this.setSize(spellConfig.hitboxSize.width, spellConfig.hitboxSize.height);
     this.setPosition(x, y);
     this.setDepth(SortingLayers.SPELL);
 
-    // Add projectile as dynamic physics body
+    // Setup physics
     scene.physics.add.existing(this, false);
 
     this.pBody = this.body as Phaser.Physics.Arcade.Body;
@@ -78,37 +112,36 @@ export default class AttackSpell extends Phaser.GameObjects.Container {
     enemy.takeDamage(this.damage);
     // Particles
     // Create particles for flame
-    let impactParticles = this.scene.add.particles(
-      this.x,
-      this.y,
-      Assets.Images.BASIC_PARTICLE,
-      {
-        color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
-        colorEase: 'quad.out',
-        lifespan: 500,
-        scale: { start: 0.7, end: 0, ease: 'sine.out' },
-        speed: 200,
-        advance: 500,
-        frequency: 50,
-        blendMode: 'ADD',
-        duration: 100,
-        angle: {
-          min: -45,
-          max: 45,
-        },
-      }
-    );
-    impactParticles.setAngle(this.angle);
-    impactParticles.setDepth(SortingLayers.SPELL);
-    // When particles are complete, destroy them
-    impactParticles.once('complete', () => {
-      impactParticles.destroy();
-    });
+    for (let impactParticleConfig of this.spellConfig.impactParticles) {
+      let impactParticles = this.scene.add.particles(
+        this.x,
+        this.y,
+        impactParticleConfig.textureKey,
+        impactParticleConfig.emitterConfig
+      );
+      impactParticles.setAngle(this.angle);
+      impactParticles.setDepth(SortingLayers.SPELL);
+      // When particles are complete, destroy them
+      impactParticles.once('complete', () => {
+        impactParticles.destroy();
+      });
+    }
+
+    // Impact screen shake
+    if (this.spellConfig.impactScreenShake) {
+      this.scene.cameras.main.shake(
+        this.spellConfig.impactScreenShake.duration,
+        this.spellConfig.impactScreenShake.intensity
+      );
+    }
 
     this.destroy();
   }
 
   destroy() {
+    for (let trailParticle of this.trailParticles) {
+      trailParticle.destroy();
+    }
     super.destroy();
   }
 }

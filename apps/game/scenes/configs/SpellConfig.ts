@@ -57,6 +57,14 @@ export const BasicSpell: SpellConfig = {
       },
     },
   ],
+  castScreenShake: {
+    duration: 100,
+    intensity: 0.04,
+  },
+  impactScreenShake: {
+    duration: 250,
+    intensity: 0.025,
+  },
 };
 
 export const AllSpells: SpellConfig[] = [BasicSpell];
