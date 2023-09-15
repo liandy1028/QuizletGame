@@ -39,6 +39,7 @@ export default function MainPage() {
 
   const handleWordButtonClick = word => {
     setSetName(word);
+    console.log(word);
   };
 
   return (
@@ -54,14 +55,18 @@ export default function MainPage() {
             onClick={() => handleWordButtonClick('Studio Ghibli Movie Trivia')}
           />
           <WordButton
-            text="Chinese Food"
-            onClick={() => handleWordButtonClick('Chinese Food')}
+            text="Chinese food"
+            onClick={() => handleWordButtonClick('Chinese food')}
+          />
+          <WordButton
+            text="Video Games & Characters"
+            onClick={() => handleWordButtonClick('Video Games & Characters')}
           />
           {/* Add more WordButtons as needed */}
         </div>
       </div>
       <GameWindow>
-        <GameComponent />
+        <GameComponent key={setName} setName={setName} />
       </GameWindow>
     </>
   );

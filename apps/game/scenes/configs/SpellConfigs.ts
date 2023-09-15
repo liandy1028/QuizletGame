@@ -10,16 +10,17 @@ export const BasicSpell: SpellConfig = {
     frameRate: 1,
     repeat: -1,
   },
-  angularVelocity: 25,
-  launchAngleRange: {
-    min: -45,
-    max: 45,
+  homingDuration: 1000,
+  acceleration: 300,
+  initialSpeed: 600,
+  launchAngleSpread: {
+    min: 2,
+    max: 35,
   },
   hitboxSize: {
     width: 50,
     height: 50,
   },
-  initialSpeed: 200,
   castParticles: [],
   impactParticles: [
     {
@@ -27,42 +28,45 @@ export const BasicSpell: SpellConfig = {
       emitterConfig: {
         color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
         colorEase: 'quad.out',
-        lifespan: 500,
-        scale: { start: 0.7, end: 0, ease: 'sine.out' },
-        speed: 200,
-        advance: 500,
-        frequency: 50,
+        lifespan: 1000,
+        scale: { start: 2, end: 0, ease: 'sine.out' },
+        speed: {
+          min: 200,
+          max: 400,
+        },
+        advance: 100,
+        frequency: 25,
         blendMode: 'ADD',
         duration: 100,
         angle: {
-          min: -45,
-          max: 45,
+          min: -35,
+          max: 35,
         },
       },
     },
   ],
   trailParticles: [
     {
-      textureKey: Assets.Images.BASIC_PARTICLE,
+      textureKey: Assets.Images.LINE_PARTICLE,
       emitterConfig: {
         color: [0xfacc22, 0xf89800, 0xf83600, 0x9f0404],
         colorEase: 'quad.out',
-        lifespan: 500,
-        scale: { start: 0.25 * Assets.SPRITE_SCALE, end: 0, ease: 'sine.out' },
-        speed: 25,
+        lifespan: 1000,
+        scale: { start: 0.6 * Assets.SPRITE_SCALE, end: 0, ease: 'sine.out' },
+        speed: 0,
         advance: 500,
-        frequency: 50,
+        frequency: 25,
         blendMode: 'ADD',
       },
     },
   ],
   castScreenShake: {
-    duration: 100,
+    duration: 50,
     intensity: 0.04,
   },
   impactScreenShake: {
-    duration: 250,
-    intensity: 0.025,
+    duration: 125,
+    intensity: 0.02,
   },
 };
 

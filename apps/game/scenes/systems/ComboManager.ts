@@ -56,7 +56,7 @@ export default class ComboManager {
   }
 
   getRandomSpellConfig() {
-    let spells = ComboConfigs.ComboSetConfig[this.currentComboIndex].spells;
-    return spells[Phaser.Math.Between(0, spells.length)];
+    let spells = ComboConfigs.ComboSetConfig[this.currentComboIndex].spellPool;
+    return spells[Phaser.Math.Between(0, spells.length - 1)];
   }
 }

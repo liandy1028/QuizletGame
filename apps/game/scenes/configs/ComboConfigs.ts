@@ -1,4 +1,4 @@
-import { SpellConfig } from '.';
+import * as SpellConfigs from './SpellConfigs';
 import { ComboLevelConfig } from '../types';
 
 const ComboLevelC: ComboLevelConfig = {
@@ -6,7 +6,7 @@ const ComboLevelC: ComboLevelConfig = {
   comboDuration: 1,
   damage: 1,
   barColor: 0x000000,
-  spells: [SpellConfig.BasicSpell],
+  spellPool: [SpellConfigs.BasicSpell],
 };
 
 const ComboLevelB: ComboLevelConfig = {
@@ -14,7 +14,7 @@ const ComboLevelB: ComboLevelConfig = {
   comboDuration: 7500,
   damage: 2,
   barColor: 0x47ffa9,
-  spells: [SpellConfig.BasicSpell],
+  spellPool: [SpellConfigs.BasicSpell],
 };
 
 const ComboLevelA: ComboLevelConfig = {
@@ -22,7 +22,7 @@ const ComboLevelA: ComboLevelConfig = {
   comboDuration: 5500,
   damage: 3,
   barColor: 0x47a0ff,
-  spells: [SpellConfig.BasicSpell],
+  spellPool: [SpellConfigs.BasicSpell],
 };
 
 const ComboLevelS: ComboLevelConfig = {
@@ -30,7 +30,7 @@ const ComboLevelS: ComboLevelConfig = {
   comboDuration: 4500,
   damage: 4,
   barColor: 0x7547ff,
-  spells: [SpellConfig.BasicSpell],
+  spellPool: [SpellConfigs.BasicSpell],
 };
 
 const ComboLevelSSS: ComboLevelConfig = {
@@ -38,7 +38,7 @@ const ComboLevelSSS: ComboLevelConfig = {
   comboDuration: 2500,
   damage: 5,
   barColor: 0xff47ed,
-  spells: [SpellConfig.BasicSpell],
+  spellPool: [SpellConfigs.BasicSpell],
 };
 
 export const ComboSetConfig: ComboLevelConfig[] = [

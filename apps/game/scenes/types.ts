@@ -53,17 +53,18 @@ export type ComboLevelConfig = {
   comboDuration: number;
   damage: number;
   barColor: number;
-  spells: SpellConfig[];
+  spellPool: SpellConfig[];
   // comboBarUIAnimation : GameAnimationConfig;
 };
 
 export type SpellConfig = {
   initialSpeed: number;
-  launchAngleRange: {
+  launchAngleSpread: {
     min: number;
     max: number;
   };
-  angularVelocity: number;
+  homingDuration: number;
+  acceleration: number;
   hitboxSize: {
     width: number;
     height: number;

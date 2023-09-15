@@ -70,6 +70,7 @@ export default class GameDirector {
     if (studiableItem.word.text == this.targetIndicator.termText.text) {
       let damage = this.comboManager.getCurrentComboDamage();
       let spellConfig = this.comboManager.getRandomSpellConfig();
+      console.log(spellConfig);
 
       this.currentTarget.tryMarkForDeath(damage);
       this.comboManager.comboUp();

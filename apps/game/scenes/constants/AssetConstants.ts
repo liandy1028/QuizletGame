@@ -4,6 +4,7 @@ export const Images = {
   LOADING: 'cards/loadingImage.png',
   PLAYER: 'player.png',
   BASIC_PARTICLE: 'spells/basicParticle.png',
+  LINE_PARTICLE: 'spells/lineParticle.png',
 };
 
 export const SpriteSheets = {};

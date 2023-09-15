@@ -8,7 +8,7 @@ import {
   AnimConfigs,
   BackgroundConfigs,
   EnemyConfigs,
-  SpellConfig,
+  SpellConfigs,
 } from './configs';
 import { GameAnimationConfig } from './types';
 import { AnimatedBackground } from './gameComponents';
@@ -73,7 +73,7 @@ export class PreloaderScene extends Scene {
     }
 
     // Load spell spritesheets
-    for (let spellConfig of SpellConfig.AllSpells) {
+    for (let spellConfig of SpellConfigs.AllSpells) {
       this.load.spritesheet(
         spellConfig.spriteSheetPath,
         spellConfig.spriteSheetPath,
@@ -137,7 +137,7 @@ export class PreloaderScene extends Scene {
     }
 
     // Load spell projectile animations
-    for (let spellConfig of SpellConfig.AllSpells) {
+    for (let spellConfig of SpellConfigs.AllSpells) {
       this.createAnimFromConfig(
         spellConfig.spriteSheetPath,
         spellConfig.spellAnimation

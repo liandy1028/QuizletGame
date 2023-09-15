@@ -73,6 +73,21 @@ export default class AttackSpell extends Phaser.GameObjects.Container {
     this.pBody = this.body as Phaser.Physics.Arcade.Body;
     this.pBody.setEnable(true);
 
+    // initial spread and velocity
+    let launchSpread = spellConfig.launchAngleSpread;
+    let angle =
+      ((Phaser.Math.Between(0, 1) * 2 - 1) *
+        (Phaser.Math.FloatBetween(launchSpread.min, launchSpread.max) *
+          Math.PI)) /
+      180;
+
+    let initialXVel = Math.cos(angle) * spellConfig.initialSpeed;
+    let initialYVel = Math.sin(angle) * spellConfig.initialSpeed;
+    this.pBody.setVelocity(initialXVel, initialYVel);
+
+    this.initialAngle = angle;
+    this.homingTimer = 0;
+
     scene.physics.add.overlap(
       this,
       targetEnemyEntity,
@@ -90,21 +105,45 @@ export default class AttackSpell extends Phaser.GameObjects.Container {
   damage: number;
   spellConfig: SpellConfig;
 
+  // state
+  initialAngle: number;
+  homingTimer: number;
+
   // Components
   sprite: Phaser.GameObjects.Sprite;
   pBody: Phaser.Physics.Arcade.Body;
   trailParticles: Phaser.GameObjects.Particles.ParticleEmitter[];
 
-  preUpdate() {
+  preUpdate(time: number, deltaTime: number) {
     let diffX = this.targetEnemyEntity.x - this.x;
     let diffY = this.targetEnemyEntity.y - this.y;
 
-    let angle = Math.atan2(diffY, diffX);
-    this.setRotation(angle);
+    let targetAngle = Math.atan2(diffY, diffX);
+    let prevVel = this.pBody.velocity;
+    let prevSpeed = prevVel.length();
 
-    let vec2 = new Phaser.Math.Vector2(diffX, diffY).normalize().scale(1000);
+    // Calculate angle steering from angularVelocity
+    this.homingTimer += deltaTime;
+    let newAngle = Phaser.Math.Linear(
+      this.initialAngle,
+      targetAngle,
+      this.homingTimer / this.spellConfig.homingDuration
+    );
 
-    this.pBody.setVelocity(vec2.x, vec2.y);
+    let newSpeed =
+      prevSpeed + (deltaTime / 1000) * this.spellConfig.acceleration;
+
+    let newVelX = Math.cos(newAngle) * newSpeed;
+    let newVelY = Math.sin(newAngle) * newSpeed;
+
+    this.pBody.setVelocity(newVelX, newVelY);
+    console.log(newVelX, newVelY);
+    this.setRotation(newAngle);
+
+    // Rotate trail particles as well
+    for (let trailParticles of this.trailParticles) {
+      trailParticles.particleRotate = (newAngle * 180) / Math.PI;
+    }
   }
 
   private onHitEnemy(self, targetEnemy) {
@@ -139,9 +178,16 @@ export default class AttackSpell extends Phaser.GameObjects.Container {
   }
 
   destroy() {
-    for (let trailParticle of this.trailParticles) {
-      trailParticle.destroy();
+    // Handle trail particles so that existing ones finish simulating before destroying
+    for (let trailParticles of this.trailParticles) {
+      trailParticles.emitting = false;
+      trailParticles.start();
+      trailParticles.duration = 1;
+      trailParticles.once('complete', () => {
+        trailParticles.destroy();
+      });
     }
+    this.trailParticles = [];
     super.destroy();
   }
 }
