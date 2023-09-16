@@ -4,7 +4,7 @@ import { ComboConfigs } from '../configs';
 
 export default class ComboManager {
   constructor(scene: Scene) {
-    this.comboBar = new ComboBar(scene, 25, 360);
+    this.comboBar = new ComboBar(scene, 50, 360);
   }
 
   // Dependencies

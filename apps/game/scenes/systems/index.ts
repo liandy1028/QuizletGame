@@ -1,6 +1,7 @@
-import EnemyManager from './EnemyManager';
+import SpawnManager from './SpawnManager';
 import GameDirector from './GameDirector';
 import HandManager from './HandManager';
 import QuizletSetBank from './QuizletSetBank';
+import SpawnSource from './SpawnSource';
 
-export { EnemyManager, GameDirector, HandManager, QuizletSetBank };
+export { SpawnManager, GameDirector, HandManager, QuizletSetBank, SpawnSource };

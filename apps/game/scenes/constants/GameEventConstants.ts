@@ -8,3 +8,4 @@ export const CARD_CLICKED = 'cardClicked';
 export const ENEMY_TOUCHED_PLAYER = 'enemyTouchedPlayer';
 export const ENEMY_DIED = 'enemy-died';
 export const ENEMY_TOOK_DAMAGE = 'enemy-took-damage';
+export const ENEMY_MARKED_FOR_DEATH = 'enemy-marked-for-death';

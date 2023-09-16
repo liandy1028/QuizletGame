@@ -137,7 +137,7 @@ export default class AttackSpell extends Phaser.GameObjects.Container {
     let newVelY = Math.sin(newAngle) * newSpeed;
 
     this.pBody.setVelocity(newVelX, newVelY);
-    console.log(newVelX, newVelY);
+    // console.log(newVelX, newVelY);
     this.setRotation(newAngle);
 
     // Rotate trail particles as well

@@ -5,6 +5,7 @@ import * as AnimConfigs from './AnimConfigs';
 import * as ComboConfigs from './ComboConfigs';
 import * as PlayerConfig from './PlayerConfig';
 import * as SpellConfigs from './SpellConfigs';
+import * as SpawnConfigs from './SpawnConfigs';
 
 export {
   EnemyConfigs,
@@ -14,4 +15,5 @@ export {
   ComboConfigs,
   PlayerConfig,
   SpellConfigs,
+  SpawnConfigs,
 };

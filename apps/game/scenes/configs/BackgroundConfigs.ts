@@ -30,7 +30,7 @@ export const GAME_OVER_BACKGROUND_CONFIG: AnimatedBackgroundConfig = {
   },
 };
 
-export const LOADING_BACKGROUND_CONFIG: AnimatedBackgroundConfig = {
+export const LOADING_ASSETS_BACKGROUND_CONFIG: AnimatedBackgroundConfig = {
   // Animations
   spriteSheetPath: 'backgrounds/loadingBackground.png',
   spriteSheetFrameConfig: {
@@ -48,5 +48,4 @@ export const LOADING_BACKGROUND_CONFIG: AnimatedBackgroundConfig = {
 export const AllBackgroundConfigs: AnimatedBackgroundConfig[] = [
   MAIN_BACKGROUND_CONFIG,
   GAME_OVER_BACKGROUND_CONFIG,
-  LOADING_BACKGROUND_CONFIG,
 ];

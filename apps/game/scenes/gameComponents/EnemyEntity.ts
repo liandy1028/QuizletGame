@@ -159,6 +159,7 @@ export default class EnemyEntity extends Phaser.GameObjects.Container {
   tryMarkForDeath(damage: number) {
     if (this.currentHealth <= damage) {
       this.markedForDeath = true;
+      this.emit(GameEvents.ENEMY_MARKED_FOR_DEATH, this);
     }
   }
 

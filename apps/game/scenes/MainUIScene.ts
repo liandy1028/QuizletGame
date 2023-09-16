@@ -4,7 +4,7 @@ import { Assets, Scenes, Registry, GameEvents } from './constants';
 type sprite = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 type text = Phaser.GameObjects.Text;
 
-export class MainUIScene extends Scene {
+export default class MainUIScene extends Scene {
   constructor() {
     super(Scenes.MAIN_UI_SCENE);
     this.score = 0;
@@ -19,6 +19,8 @@ export class MainUIScene extends Scene {
   };
 
   create() {
+    this.score = 0;
+
     this.scoreTextGameObject = this.add
       .text(0, 0, 'Score: ', this.textStyle)
       .setOrigin(0, 0)

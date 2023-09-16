@@ -13,7 +13,7 @@ import {
   PlayerEntity,
 } from './gameComponents';
 import {
-  EnemyManager,
+  SpawnManager,
   GameDirector,
   HandManager,
   QuizletSetBank,
@@ -25,16 +25,17 @@ import ComboManager from './systems/ComboManager';
 
 type GameObject = Phaser.GameObjects.GameObject;
 
-export class MainScene extends Scene {
+export default class MainScene extends Scene {
   constructor() {
     super(Scenes.MAIN_SCENE);
   }
 
   // State
   isGameOver: boolean;
+  private score: number;
 
   // Components
-  enemyManager: EnemyManager;
+  enemyManager: SpawnManager;
   handManager: HandManager;
   comboManager: ComboManager;
   player: PlayerEntity;
@@ -46,6 +47,7 @@ export class MainScene extends Scene {
     this.createBackground();
     this.setupEvents();
     this.isGameOver = false;
+    this.score = 0;
 
     // Additively loads UI scene
     this.scene.launch(Scenes.MAIN_UI_SCENE);
@@ -74,13 +76,13 @@ export class MainScene extends Scene {
 
     this.player = new PlayerEntity(this);
 
-    this.enemyManager = new EnemyManager(this, this.player);
+    this.enemyManager = new SpawnManager(this, this.player);
 
     this.targetIndicator = new TargetIndicatorEntity(this);
 
     this.handManager = new HandManager(5, this)
-      .setPosition(this.cameras.main.width / 2, 600)
-      .setSize(this.cameras.main.width * 0.8, 50)
+      .setPosition(this.cameras.main.width / 2 + 50, 570)
+      .setSize(this.cameras.main.width * 0.8, 60)
       .setDepth(SortingLayers.HAND);
 
     this.comboManager = new ComboManager(this);
@@ -113,5 +115,14 @@ export class MainScene extends Scene {
     this.isGameOver = true;
     this.scene.stop(Scenes.MAIN_UI_SCENE);
     this.scene.start(Scenes.GAME_OVER_SCENE);
+  }
+
+  getScore() {
+    return this.score;
+  }
+
+  addToScore(value: number) {
+    this.score += value;
+    this.events.emit(GameEvents.SCORE_ADD_EVENT, value);
   }
 }

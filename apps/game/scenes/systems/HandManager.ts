@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { Assets, GameEvents, Registry } from '../constants';
+import { EffectConfigs } from '../configs';
 import { DefinitionCard } from '../gameComponents';
 import { GameStudiableItem } from '../types';
 
@@ -53,9 +54,21 @@ export default class HandManager extends Phaser.GameObjects.Container {
   public setAllowSelection(state: boolean) {
     this.allowSelection = state;
     if (state == true) {
-      this.setAlpha(1);
+      for (let card of this.heldCards) {
+        card.setAlpha(1);
+      }
+      for (let card of this.nextCards) {
+        card.setAlpha(1);
+      }
+      // this.setAlpha(1);
     } else {
-      this.setAlpha(0.6);
+      for (let card of this.heldCards) {
+        card.setAlpha(0.6);
+      }
+      for (let card of this.nextCards) {
+        card.setAlpha(0.6);
+      }
+      // this.setAlpha(0.6);
     }
   }
 
@@ -128,7 +141,7 @@ export default class HandManager extends Phaser.GameObjects.Container {
       let config: Phaser.Types.Tweens.TweenBuilderConfig = {
         targets: card,
         x: x,
-        y: 0,
+        y: Math.abs((x / this.width) * this.height),
         scale: 1,
         angle: ((2 * x) / this.width) * this.maxRot,
         duration: this.moveSpeed,
@@ -149,9 +162,11 @@ export default class HandManager extends Phaser.GameObjects.Container {
       }
       this.bringToTop(card);
     }
-    if (this.focused !== null) this.bringToTop(this.focused);
+    if (this.focused) this.bringToTop(this.focused);
+    if (this.usedCard) this.bringToTop(this.usedCard);
   }
 
+  private usedCard: DefinitionCard;
   private focused: DefinitionCard;
   public update(deltaTime: number) {
     if (this.heldCards.length < this.size) {
@@ -187,15 +202,20 @@ export default class HandManager extends Phaser.GameObjects.Container {
   }
 
   private flip(configs: Phaser.Types.Tweens.TweenBuilderConfig) {
-    let stayDuration = this.allowSelection ? 0 : 1000;
+    let correct = this.allowSelection;
+    let stayDuration = correct ? 0 : EffectConfigs.TIMEOUT_TIME - 780;
     let card: DefinitionCard = configs.targets;
+    this.usedCard = card;
+    card.markCorrect(correct);
+    card.setAlpha(1);
 
     configs.tweens = [
       {
         scaleX: 0,
-        x: 0,
-        y: -400,
-        angle: 45,
+        // x: 0,
+        // y: -400,
+        // angle: 45,
+        y: -this.height * 2,
         duration: 150,
         ease: Phaser.Math.Easing.Sine,
         onComplete: () => {
@@ -204,21 +224,22 @@ export default class HandManager extends Phaser.GameObjects.Container {
       },
       {
         scaleX: 1,
-        angle: 90,
+        // angle: 90,
         duration: 90,
       },
       {
-        scale: 1.3,
+        scale: 1.5,
         duration: 75,
         ease: Phaser.Math.Easing.Expo.Out,
       },
       {
-        scale: 0.8,
+        scale: 1.2,
         duration: 375,
         hold: stayDuration,
         ease: Phaser.Math.Easing.Bounce.Out,
         onComplete: () => {
           card.flip();
+          this.usedCard = null;
         },
       },
     ];

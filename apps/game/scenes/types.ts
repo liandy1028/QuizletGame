@@ -14,6 +14,7 @@ export type EnemyConfig = {
   speed: number;
   damageStunnedDuration: number;
   pointReward: number;
+  spawnCreditCost: number;
 
   // Spritesheet (reuse filepath as key)
   spriteSheetPath: string;
@@ -94,4 +95,15 @@ export type GameAnimationConfig = {
   frames?: Phaser.Types.Animations.AnimationFrame[];
   frameRate: number;
   repeat: number;
+};
+
+export type SpawnSourceConfig = {
+  spawnDelay: {
+    min: number;
+    max: number;
+  };
+  initialCredits: number;
+  initialSpawnDelay: number;
+  spawnCreditMultipler: number;
+  spawnCreditGainCalculator: (score: number) => number;
 };

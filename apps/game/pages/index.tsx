@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import dynamic from 'next/dynamic';
 import WordButton from '../components/WordButton';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 
 // Dynamically load game component to prevent errors with importing phaser synchronously
@@ -28,12 +28,14 @@ const OuterBox = styled.div`
 const GameWindow = styled.div`
   width: 100%;
   height: 100%;
+  position: fixed;
   overflow: hidden;
   display: flex;
   canvas {
     margin: auto;
     max-height: 100%;
     max-width: 100%;
+    touch-action: none;
   }
 `;
 
@@ -42,12 +44,13 @@ const LoadingDiv = styled.div`
   width: 75%;
   text-align: center;
   font-size: 50px;
+  color: #ffffff;
 `;
 
 // #endregion
 
 export default function MainPage() {
-  const [setName, setSetName] = useState(null);
+  const [setName, setSetName] = useState('Jokes');
 
   const handleWordButtonClick = word => {
     setSetName(word);

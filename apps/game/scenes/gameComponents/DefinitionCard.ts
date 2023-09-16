@@ -117,22 +117,21 @@ export default class DefinitionCard extends Phaser.GameObjects.Container {
   }
 
   private addBackText() {
-    let fontSize = 80;
+    let fontSize = 40;
     this.add(
       this.scene.add
         .text(0, 0, this.studiableItem.word.text, {
           color: '#FFFFFF',
           fontSize: fontSize,
         })
-        .setWordWrapWidth(this.height * 0.9)
+        .setWordWrapWidth(this.width * 0.9)
         .setOrigin(0.5, 0.5)
         .setName('back-text')
-        .setAngle(-90)
     );
     let cardText = this.getByName<Phaser.GameObjects.Text>('back-text');
     while (
-      cardText.width > this.height * 0.9 ||
-      cardText.height > this.width * 0.9
+      cardText.width > this.width * 0.9 ||
+      cardText.height > this.height * 0.9
     ) {
       fontSize *= 0.9;
       cardText.setFontSize(fontSize);
@@ -151,6 +150,15 @@ export default class DefinitionCard extends Phaser.GameObjects.Container {
     let img = this.getByName<Phaser.GameObjects.Sprite>('image');
     img?.setVisible(!img.visible);
     return this;
+  }
+
+  public markCorrect(correct: boolean) {
+    let text = this.getByName<Phaser.GameObjects.Text>('back-text');
+    if (correct) {
+      text.setColor('#00FF00');
+    } else {
+      text.setColor('#FF0000');
+    }
   }
 
   studiableItem: GameStudiableItem;

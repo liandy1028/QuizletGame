@@ -5,7 +5,7 @@ import { BackgroundConfigs } from './configs';
 
 type text = Phaser.GameObjects.Text;
 
-export class GameOverScene extends Scene {
+export default class GameOverScene extends Scene {
   constructor() {
     super(Scenes.GAME_OVER_SCENE);
   }

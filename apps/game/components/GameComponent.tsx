@@ -6,17 +6,18 @@ import * as SizeConsts from './gameSize';
 
 export default function GameComponent(props: { setName?: string }) {
   function initPhaser() {
-    var config: Phaser.Types.Core.GameConfig = {
+    let config: Phaser.Types.Core.GameConfig = {
       type: Phaser.CANVAS,
       width: SizeConsts.WIDTH,
       height: SizeConsts.HEIGHT,
       canvas: document.getElementById('canvas') as HTMLCanvasElement,
-      antialias: true,
+      transparent: true,
+      // antialias: true,
       physics: {
         default: 'arcade',
         arcade: {
           gravity: { y: 0 },
-          debug: true,
+          // debug: true,
         },
       },
       scene: [Preloader, MainScene, MainUIScene, GameOverScene],

@@ -2,10 +2,11 @@ import { Assets } from '../constants';
 import { EnemyConfig } from '../types';
 
 export const TEST_ENEMY: EnemyConfig = {
-  maxHealth: 2,
-  speed: 50,
+  maxHealth: 1,
+  speed: 25,
   damageStunnedDuration: 1000,
   pointReward: 10,
+  spawnCreditCost: 5,
 
   // Animations
   spriteSheetPath: 'enemies/dummyEnemy.png',
@@ -32,5 +33,9 @@ export const TEST_ENEMY: EnemyConfig = {
     repeat: 0,
   },
 };
+
+// bird
+// bunny
+// turtle
 
 export const AllEnemyConfigs: EnemyConfig[] = [TEST_ENEMY];

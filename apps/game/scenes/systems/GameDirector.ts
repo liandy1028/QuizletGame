@@ -3,7 +3,7 @@ import { Assets, GameEvents } from '../constants';
 import { Dataset, StudiableItem } from 'dataset/types';
 
 import QuizletSetBank from './QuizletSetBank';
-import EnemyManager from './EnemyManager';
+import SpawnManager from './SpawnManager';
 import TargetIndicatorEntity from '../gameComponents/TargetIndicatorEntity';
 import HandManager from './HandManager';
 import { AttackSpell, EnemyEntity } from '../gameComponents';
@@ -14,7 +14,7 @@ import ComboManager from './ComboManager';
 export default class GameDirector {
   constructor(
     quizletSetBank: QuizletSetBank,
-    enemyManager: EnemyManager,
+    enemyManager: SpawnManager,
     targetIndicator: TargetIndicatorEntity,
     handManager: HandManager,
     comboManager: ComboManager,
@@ -40,7 +40,7 @@ export default class GameDirector {
   // Dependencies
   scene: Scene;
   quizletSetBank: QuizletSetBank;
-  enemyManager: EnemyManager;
+  enemyManager: SpawnManager;
   targetIndicator: TargetIndicatorEntity;
   handManager: HandManager;
   comboManager: ComboManager;

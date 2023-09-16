@@ -35,7 +35,7 @@ const ComboLevelS: ComboLevelConfig = {
 
 const ComboLevelSSS: ComboLevelConfig = {
   comboLevelDisplayName: 'SSS',
-  comboDuration: 2500,
+  comboDuration: 3000,
   damage: 5,
   barColor: 0xff47ed,
   spellPool: [SpellConfigs.BasicSpell],

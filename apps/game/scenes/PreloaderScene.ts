@@ -13,9 +13,30 @@ import {
 import { GameAnimationConfig } from './types';
 import { AnimatedBackground } from './gameComponents';
 
-export class PreloaderScene extends Scene {
+export default class PreloaderScene extends Scene {
   constructor() {
     super(Scenes.PRELOADER_SCENE);
+
+    // Preload loading screen
+    Phaser.Scene.call(this, {
+      key: 'preloader',
+      pack: {
+        files: [
+          {
+            type: 'spritesheet',
+            key: BackgroundConfigs.LOADING_ASSETS_BACKGROUND_CONFIG
+              .spriteSheetPath,
+            url:
+              'game/assets/' +
+              BackgroundConfigs.LOADING_ASSETS_BACKGROUND_CONFIG
+                .spriteSheetPath,
+            frameConfig:
+              BackgroundConfigs.LOADING_ASSETS_BACKGROUND_CONFIG
+                .spriteSheetFrameConfig,
+          },
+        ],
+      },
+    });
   }
 
   preload() {
@@ -23,7 +44,48 @@ export class PreloaderScene extends Scene {
     this.load.on('progress', this.onProgress, this);
     this.load.on('fileprogress', this.onFileProgress, this);
 
-    // Load quizlet
+    this.load.setPath('game/assets');
+    this.setupLoadingScreenBackground();
+
+    this.loadQuizletSets();
+    this.loadAssets();
+  }
+
+  onProgress(loadProgress: number) {
+    console.log('onProgress: ' + loadProgress);
+  }
+
+  onFileProgress(file: Phaser.Loader.File, percentComplete: number) {
+    console.log(
+      'onFileProgress: file.key=' +
+        file.key +
+        ' from ' +
+        file.url +
+        ' | progress: ' +
+        percentComplete
+    );
+  }
+
+  create() {
+    this.createAnimations();
+    this.scene.start(Scenes.MAIN_SCENE);
+  }
+
+  private setupLoadingScreenBackground() {
+    let backgroundConfigSpritesheet =
+      BackgroundConfigs.LOADING_ASSETS_BACKGROUND_CONFIG.spriteSheetPath;
+    this.createAnimFromConfig(
+      backgroundConfigSpritesheet,
+      BackgroundConfigs.LOADING_ASSETS_BACKGROUND_CONFIG.anim
+    );
+
+    new AnimatedBackground(
+      this,
+      BackgroundConfigs.LOADING_ASSETS_BACKGROUND_CONFIG
+    );
+  }
+
+  private loadQuizletSets() {
     const quizletSets = Quizlet.getAllSets();
     let setName: string = this.registry.get(Registry.QUIZLET_SET_NAME);
     let usedDataset: Dataset = {
@@ -45,10 +107,9 @@ export class PreloaderScene extends Scene {
       Registry.QUIZLET_SET_BANK,
       new QuizletSetBank(usedDataset, this.load)
     );
+  }
 
-    // Load game assets
-    this.load.setPath('game/assets');
-
+  private loadAssets() {
     // Load images
     for (let imagePath in Assets.Images) {
       this.load.image(Assets.Images[imagePath], Assets.Images[imagePath]);
@@ -87,22 +148,8 @@ export class PreloaderScene extends Scene {
       AnimConfigs.HEALTH_BAR_IDLE_ANIM.spriteSheetFrameConfig
     );
   }
-  onProgress(loadProgress: number) {
-    console.log('onProgress: ' + loadProgress);
-  }
 
-  onFileProgress(file: Phaser.Loader.File, percentComplete: number) {
-    console.log(
-      'onFileProgress: file.key=' +
-        file.key +
-        ' from ' +
-        file.url +
-        ' | progress: ' +
-        percentComplete
-    );
-  }
-
-  create() {
+  private createAnimations() {
     // Healthbar anims
     this.createAnimFromConfig(
       AnimConfigs.HEALTH_BAR_IDLE_ANIM.spriteSheetPath,
@@ -143,13 +190,6 @@ export class PreloaderScene extends Scene {
         spellConfig.spellAnimation
       );
     }
-
-    let loadingBG = new AnimatedBackground(
-      this,
-      BackgroundConfigs.LOADING_BACKGROUND_CONFIG
-    );
-
-    this.scene.start(Scenes.MAIN_SCENE);
   }
 
   private createAnimFromConfig(
